@@ -1,0 +1,32 @@
+---
+import { site } from "../../data/site";
+import { url } from "../../i18n";
+const L = site.legal;
+---
+
+<h2>1. Purpose</h2>
+<p>These terms of use govern access to and use of <strong>{site.url.replace("https://", "")}</strong>, published by {L.legalName}. By browsing the site, you accept these terms.</p>
+
+<h2>2. Access</h2>
+<p>The site is freely accessible to anyone with internet access. {L.legalName} strives to keep it available at all times, without any guarantee. Access may be interrupted for maintenance or in case of force majeure.</p>
+
+<h2>3. Services</h2>
+<p>The site lets you learn about the association and its services, send a project enquiry and book a meeting with the team. An enquiry or booking does not commit either party to a contract: any service is subject to an accepted quote and, where applicable, our <a href={url("sales", "en")}>terms of sale</a>.</p>
+
+<h2>4. User commitments</h2>
+<p>Users agree to provide accurate information, not to use the forms for unlawful, abusive or advertising purposes, and not to disrupt the site (intrusion attempts, automated submissions, etc.). Booking on behalf of a third party without their consent is prohibited.</p>
+
+<h2>5. Online meetings</h2>
+<p>Meetings are offered according to the team’s availability, in Paris time. A confirmation email includes a personal link to reschedule or cancel; please do not share it. If you can no longer attend, please cancel to free up the slot. The association may cancel a meeting, in which case you will be informed by email.</p>
+
+<h2>6. Intellectual property</h2>
+<p>Site content is protected by intellectual property law. See the <a href={url("legal", "en")}>legal notice</a>.</p>
+
+<h2>7. Liability</h2>
+<p>Information on the site is provided for guidance only. {L.legalName} cannot be held liable for indirect damage arising from use of the site, nor for the content of linked third-party sites.</p>
+
+<h2>8. Personal data</h2>
+<p>Data collected through the site is processed in accordance with our <a href={url("privacy", "en")}>privacy policy</a>.</p>
+
+<h2>9. Changes and governing law</h2>
+<p>{L.legalName} may amend these terms at any time; the version online at the time of your visit applies. These terms are governed by French law. Any dispute will first be settled amicably where possible; failing that, the French courts will have jurisdiction under ordinary rules.</p>

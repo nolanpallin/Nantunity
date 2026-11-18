@@ -1,0 +1,96 @@
+---
+// Polices auto-hébergées (aucune requête vers un service tiers), chargées avec font-display: swap
+import "@fontsource/anton/latin-400.css";                      // titres (écho à « UNITY »)
+import "@fontsource-variable/roboto/wght.css";                 // police principale
+import "@fontsource-variable/fraunces/soft-italic.css";        // italique d'accent (axes wght + SOFT, 76 Ko)
+import "../styles/global.css";
+
+import SEO from "../components/SEO.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import LegalStrip from "../components/LegalStrip.astro";
+import CookieConsent from "../components/CookieConsent.astro";
+import { htmlLang, useT, type Lang } from "../i18n";
+import fs from "node:fs";
+import path from "node:path";
+
+interface Props {
+  lang: Lang;
+  alternates?: Partial<Record<Lang, string>>;
+  title?: string;
+  description?: string;
+  image?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /**
+   * Couleur du texte de l'en-tête au-dessus du hero :
+   *  - "auto"  : hero qui suit le thème (par défaut) → texte foncé en mode clair, clair en mode sombre
+   *  - "light" : hero de couleur foncée fixe (pôles Stratégie, Web, Graphisme) → texte clair
+   *  - "dark"  : hero de couleur claire fixe (orange, pôle Événementiel) → texte foncé
+   */
+  headerTone?: "light" | "dark" | "auto";
+  /** Variables CSS de pôle appliquées à toute la page (pages pôle / projet) */
+  poleStyle?: string;
+  /** false : page sans footer complet (pages individuelles des pôles) → simple ligne légale à la place */
+  footer?: boolean;
+}
+const { lang, alternates = {}, headerTone = "auto", poleStyle, footer = true, ...seo } = Astro.props;
+const t = useT(lang);
+
+/**
+ * Police des titres « Extenda » (licence commerciale, non incluse) :
+ * il suffit de déposer son fichier (.woff2 de préférence) dans public/fonts/extenda/ ;
+ * il est détecté au build et déclaré automatiquement. Sans fichier, les titres restent en Anton.
+ */
+let extenda: { url: string; format: string } | null = null;
+try {
+  const dir = path.join(process.cwd(), "public", "fonts", "extenda");
+  const file = fs.readdirSync(dir).sort((a, b) => (b.endsWith(".woff2") ? 1 : 0) - (a.endsWith(".woff2") ? 1 : 0)).find((f) => /\.(woff2|woff|otf|ttf)$/i.test(f));
+  if (file) {
+    const ext = file.split(".").pop()!.toLowerCase();
+    extenda = { url: `/fonts/extenda/${encodeURIComponent(file)}`, format: { woff2: "woff2", woff: "woff", otf: "opentype", ttf: "truetype" }[ext]! };
+  }
+} catch { /* dossier absent : repli sur Anton */ }
+---
+
+<!doctype html>
+<html lang={htmlLang[lang]} data-lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0b0b0b" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <SEO lang={lang} alternates={alternates} {...seo} />
+    {
+      extenda && (
+        <>
+          <link rel="preload" href={extenda.url} as="font" type={`font/${extenda.format === "opentype" ? "otf" : extenda.format === "truetype" ? "ttf" : extenda.format}`} crossorigin />
+          <style is:inline set:html={`@font-face{font-family:"Extenda";src:url("${extenda.url}") format("${extenda.format}");font-weight:400;font-style:normal;font-display:swap}`} />
+        </>
+      )
+    }
+    <!-- Thème appliqué avant l'affichage (évite le flash) : choix mémorisé, sinon thème du système -->
+    <script is:inline>
+      (function () {
+        var d = document.documentElement, s = null;
+        try { s = localStorage.getItem("nu-theme"); } catch (e) {}
+        d.dataset.theme = s === "light" || s === "dark" ? s : (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        d.classList.add("js");
+      })();
+    </script>
+  </head>
+  <body data-header-tone={headerTone} style={poleStyle}>
+    <a class="skip-link" href="#contenu">{t.common.skip}</a>
+    <Header lang={lang} alternates={alternates} />
+    <main id="contenu" tabindex="-1">
+      <slot />
+    </main>
+    {footer ? <Footer lang={lang} /> : <LegalStrip lang={lang} />}
+    <CookieConsent lang={lang} />
+    <script>
+      import "../scripts/main.ts";
+    </script>
+  </body>
+</html>

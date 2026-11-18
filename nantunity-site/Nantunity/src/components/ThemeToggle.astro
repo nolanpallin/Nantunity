@@ -1,0 +1,31 @@
+---
+/** Bouton clair / sombre. Le choix est mémorisé (localStorage « nu-theme »). */
+import { useT, type Lang } from "../i18n";
+interface Props { lang: Lang }
+const t = useT(Astro.props.lang);
+---
+
+<button type="button" class="theme-toggle" data-theme-toggle data-label-light={t.common.themeToLight} data-label-dark={t.common.themeToDark} aria-label={t.common.themeToDark}>
+  <svg class="theme-toggle__sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+    <circle cx="12" cy="12" r="4.5" fill="currentColor" />
+    <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8" />
+    </g>
+  </svg>
+  <svg class="theme-toggle__moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+    <path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z" fill="currentColor" />
+  </svg>
+</button>
+
+<style>
+  .theme-toggle {
+    position: relative; width: 42px; height: 42px; border-radius: 50%;
+    display: grid; place-items: center; overflow: hidden;
+    transition: background var(--dur-fast);
+  }
+  .theme-toggle:hover { background: color-mix(in srgb, currentColor 14%, transparent); }
+  .theme-toggle svg { grid-area: 1 / 1; transition: transform 600ms var(--ease-out), opacity 300ms; }
+  /* En mode clair : on propose la lune ; en mode sombre : le soleil */
+  :global([data-theme="light"]) .theme-toggle__sun { transform: translateY(140%) rotate(90deg); opacity: 0; }
+  :global([data-theme="dark"]) .theme-toggle__moon { transform: translateY(-140%) rotate(-90deg); opacity: 0; }
+</style>

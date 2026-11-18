@@ -1,0 +1,45 @@
+---
+/**
+ * Ligne légale minimale, utilisée sur les pages sans footer (pages individuelles des pôles).
+ * Garde accessibles les mentions légales (LCEN) et la gestion des cookies (CNIL) sur toutes les pages.
+ * Reprend la couleur du pôle pour prolonger le dernier bandeau sans rupture visuelle.
+ */
+import { useT, url, type Lang } from "../i18n";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const year = new Date().getFullYear();
+const links = [
+  { label: t.footer.legalNotice, href: url("legal", lang) },
+  { label: t.footer.privacy, href: url("privacy", lang) },
+  { label: t.footer.cookies, href: url("cookies", lang) },
+  { label: t.footer.terms, href: url("terms", lang) },
+  { label: t.footer.sales, href: url("sales", lang) },
+];
+---
+
+<footer class="lstrip theme-pole">
+  <div class="container lstrip__inner">
+    <p class="lstrip__copy">© {year} Nant'Unity</p>
+    <nav aria-label={t.footer.legal}>
+      <ul role="list" class="lstrip__links">
+        {links.map((l) => <li><a href={l.href} class="link-u">{l.label}</a></li>)}
+        <li><button type="button" class="link-u lstrip__btn" data-cookie-open>{t.footer.cookieSettings}</button></li>
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .lstrip { font-size: var(--fs-xs); }
+  .lstrip__inner {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1.5rem;
+    padding-block: 1rem 1.25rem;
+    border-top: 1px solid color-mix(in srgb, var(--pole-ink) 25%, transparent);
+  }
+  .lstrip__copy { opacity: 0.85; }
+  .lstrip__links { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; }
+  .lstrip__links a, .lstrip__btn { color: var(--pole-ink); font-size: inherit; font-weight: 500; }
+  .lstrip__btn { text-align: left; }
+  @media (max-width: 600px) { .lstrip__inner { flex-direction: column; align-items: flex-start; } }
+</style>

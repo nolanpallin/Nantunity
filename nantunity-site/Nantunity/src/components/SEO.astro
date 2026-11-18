@@ -1,0 +1,57 @@
+---
+import { site, activeSocials } from "../data/site";
+import { useT, ogLocale, htmlLang, locales, defaultLang, type Lang } from "../i18n";
+
+interface Props {
+  lang: Lang;
+  alternates?: Partial<Record<Lang, string>>;
+  title?: string;
+  description?: string;
+  image?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+const { lang, alternates = {}, title, image = "/og-image.png", noindex = false, jsonLd } = Astro.props;
+const t = useT(lang);
+const description = Astro.props.description ?? t.meta.description;
+const base = Astro.site ?? site.url;
+const fullTitle = title ? `${title} — ${site.name}` : t.meta.siteTitle;
+const canonical = new URL(Astro.url.pathname, base).href;
+const ogImage = new URL(image, base).href;
+
+const org = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: site.name,
+  url: site.url,
+  logo: new URL("/favicon.svg", site.url).href,
+  description: t.meta.description,
+  email: site.contact.email,
+  address: { "@type": "PostalAddress", addressLocality: "Nantes", addressCountry: "FR" },
+  sameAs: activeSocials.map((s) => s.url),
+};
+const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])];
+const alts = locales.filter((l) => alternates[l]);
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex" />}
+{alts.map((l) => <link rel="alternate" hreflang={htmlLang[l]} href={new URL(alternates[l]!, base).href} />)}
+{alternates[defaultLang] && <link rel="alternate" hreflang="x-default" href={new URL(alternates[defaultLang]!, base).href} />}
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:locale" content={ogLocale[lang]} />
+{alts.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={ogLocale[l]} />)}
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />

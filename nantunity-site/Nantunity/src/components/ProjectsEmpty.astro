@@ -1,0 +1,66 @@
+---
+/**
+ * État vide du portfolio, affiché tant qu'aucune réalisation n'est publiée.
+ * Visuel : les quatre colonnes de pôles (motif « UNITY ») qui attendent leurs projets.
+ */
+import Arrow from "./Arrow.astro";
+import { getPoles, poleVars } from "../data/poles";
+import { useT, url, type Lang } from "../i18n";
+interface Props { lang: Lang; compact?: boolean; headingLevel?: "h2" | "h3" }
+const { lang, compact = false, headingLevel = "h2" } = Astro.props;
+const t = useT(lang);
+const pp = t.projectsPage;
+const poles = getPoles(lang);
+const H = headingLevel;
+---
+
+<div class:list={["empty", compact && "empty--compact"]} data-reveal>
+  <div class="empty__visual" aria-hidden="true">
+    {
+      poles.map((p, i) => (
+        <span class="empty__col" style={`${poleVars(p)}--i:${i}`}>
+          <span class="empty__num display">{p.index}</span>
+        </span>
+      ))
+    }
+  </div>
+  <div class="empty__text">
+    <p class="label empty__label">{pp.emptyLabel}</p>
+    <H class="empty__title display">{pp.emptyTitle} <span class="serif-i">{pp.emptyAccent}’</span></H>
+    <p class="empty__p">{pp.emptyText}</p>
+    <div class="empty__actions">
+      <a href={url("contact", lang)} class="btn" data-magnetic>{t.common.startProject} <Arrow /></a>
+      <a href={url("booking", lang)} class="btn btn--ghost">{t.common.book}</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .empty {
+    display: grid; grid-template-columns: 1fr 1.25fr; gap: clamp(2rem, 6vw, 6rem); align-items: center;
+    padding: clamp(1.5rem, 4vw, 3.5rem); border-radius: var(--radius-l);
+    background: var(--surface); border: 1px solid var(--line);
+  }
+  .empty__visual { display: flex; align-items: flex-end; gap: 8px; height: clamp(200px, 26vw, 340px); }
+  .empty__col {
+    flex: 1; height: calc(40% + var(--i) * 15%);
+    background: var(--pole-bg); color: var(--pole-title);
+    display: flex; align-items: flex-end; justify-content: center; padding: 0.6rem 0.6rem 1rem;
+    border-radius: 0 0 999px 999px;
+    clip-path: polygon(0 calc(8% + var(--i) * 2%), 100% 0, 100% 100%, 0 100%);
+    transform-origin: bottom;
+    animation: empty-breathe 3.2s var(--ease-in-out) infinite alternate;
+    animation-delay: calc(var(--i) * 260ms);
+  }
+  .empty__num { font-size: var(--fs-xl); }
+  @keyframes empty-breathe { to { transform: scaleY(0.82); } }
+  .empty__label { color: var(--accent-text); }
+  .empty__title { font-size: var(--fs-3xl); margin-top: 1rem; }
+  .empty__title .serif-i { display: block; margin-top: 0.12em; color: var(--accent-display); font-size: 0.85em; line-height: 1.15; }
+  .empty__p { margin-top: 1.25rem; color: var(--fg-muted); font-size: var(--fs-lg); max-width: 46ch; }
+  .empty__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.75rem; }
+  .empty--compact .empty__title { font-size: var(--fs-2xl); }
+  .empty--compact .empty__visual { height: clamp(160px, 18vw, 240px); }
+  @media (max-width: 760px) { .empty { grid-template-columns: 1fr; } .empty__visual { height: 160px; } }
+  @media (prefers-reduced-motion: reduce) { .empty__col { animation: none; } }
+</style>

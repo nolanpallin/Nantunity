@@ -1,0 +1,45 @@
+---
+import F from "../F.astro";
+import { site } from "../../data/site";
+const L = site.legal;
+---
+
+<div class="legal-warning">
+  <strong>Template pending validation.</strong> These terms of sale are a draft structure. They must be adapted to how the association actually operates (study agreements, tax status, payment terms, etc.) and validated, for example with the CNJE or a legal professional, before use.
+</div>
+
+<h2>1. Scope</h2>
+<p>These terms of sale apply to services provided by {L.legalName} (French non-profit association, <F v={L.rna} />) to business clients (companies, non-profits, shops) and private individuals. They prevail over any other document unless special conditions are agreed in writing.</p>
+
+<h2>2. Quotes and orders</h2>
+<p>Every service is subject to a free, detailed quote (description, deliverables, timeline, price), valid for <F v="[To be completed: validity period, e.g. 30 days]" />. The order is binding upon receipt of the dated and signed quote, together with any deposit required.</p>
+
+<h2>3. Prices</h2>
+<p>Prices are stated in euros, <F v="[To be completed: excluding/including VAT, applicable VAT regime]" />. Additional requests are subject to an amendment.</p>
+
+<h2>4. Payment</h2>
+<p>A deposit of <F v="[To be completed: percentage]" /> is due on order; the balance is payable <F v="[To be completed: e.g. within 30 days of invoice]" /> by bank transfer. For business clients, late payment automatically incurs penalties at the European Central Bank’s most recent refinancing rate plus 10 percentage points (Article L.441-10 of the French Commercial Code) and a fixed recovery fee of €40 (Article D.441-5).</p>
+
+<h2>5. Delivery and timelines</h2>
+<p>Timelines are set out in the quote and run from the order date and receipt of the materials required from the client. Delays caused by missing materials or approvals extend timelines accordingly.</p>
+
+<h2>6. Client obligations</h2>
+<p>The client undertakes to provide accurate information and content, to hold the rights to any materials supplied, and to approve deliverables within the agreed timeframe. Without feedback within <F v="[To be completed: e.g. 15 days]" /> of delivery, deliverables are deemed accepted.</p>
+
+<h2>7. Intellectual property</h2>
+<p>Economic rights to the delivered work are assigned to the client upon full payment, for the uses, media, territory and duration specified in the quote (Article L.131-3 of the French Intellectual Property Code). Preparatory work and unused concepts remain the property of {L.legalName}. Unless the client objects in writing, {L.legalName} may showcase the work in its portfolio.</p>
+
+<h2>8. Confidentiality</h2>
+<p>{L.legalName} undertakes to keep confidential any non-public information shared by the client during the project.</p>
+
+<h2>9. Liability</h2>
+<p>{L.legalName} has an obligation of means. Its liability is limited to direct damage and, for business clients, to the price of the service concerned. <F v="[To be completed: civil liability insurance, if any]" /></p>
+
+<h2>10. Right of withdrawal (private individuals)</h2>
+<p>Where a contract is concluded at a distance or off-premises with a consumer, the consumer has 14 days to withdraw without giving reasons (Article L.221-18 of the French Consumer Code), by notifying us in writing at <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>. If the consumer expressly asks for the service to begin before the end of this period, they remain liable for the services provided up to withdrawal, and lose the right of withdrawal once the service has been fully performed with their prior express consent (Articles L.221-25 and L.221-28).</p>
+
+<h2>11. Consumer mediation</h2>
+<p>Private clients may refer disputes free of charge to a consumer mediator (Article L.612-1 of the French Consumer Code): <F v={L.mediator} />.</p>
+
+<h2>12. Governing law</h2>
+<p>These terms are governed by French law. The parties will seek an amicable solution first. Failing that, for business clients, the courts of <F v="[To be completed: e.g. Nantes]" /> have jurisdiction; for consumers, statutory jurisdiction rules apply.</p>

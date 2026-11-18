@@ -1,0 +1,165 @@
+---
+/**
+ * Motifs du patrimoine nantais en arrière-plan : dessins au trait, simplifiés et très discrets.
+ *  - tour-lu    : la tour LU (biscuiterie Lefèvre-Utile, Lieu Unique)
+ *  - chateau    : le château des ducs de Bretagne
+ *  - cathedrale : la cathédrale Saint-Pierre-et-Saint-Paul
+ *  - grue       : la grue Titan jaune de l'île de Nantes
+ *  - elephant   : le Grand Éléphant des Machines de l'île
+ *  - loire      : les vagues de la Loire
+ *
+ * Usage : <Heritage motif="tour-lu" class="..." /> dans une section portant la classe « has-motif ».
+ * Purement décoratif (aria-hidden), couleur = texte de la section à très faible opacité,
+ * donc s'adapte automatiquement aux thèmes clair/sombre.
+ */
+interface Props {
+  motif: "tour-lu" | "chateau" | "cathedrale" | "grue" | "elephant" | "loire";
+  /** position : classes utilitaires .hm--tr (haut droite), .hm--br, .hm--bl, .hm--tl, .hm--bottom */
+  class?: string;
+  /** largeur du motif (CSS), ex. "clamp(220px, 30vw, 460px)" */
+  size?: string;
+}
+const { motif, class: className = "hm--br", size = "clamp(220px, 30vw, 440px)" } = Astro.props;
+
+/** Rempart crénelé : sommet horizontal avec merlons entre x0 et x1 à la hauteur y */
+function crenels(x0: number, x1: number, y: number, w = 8, h = 7) {
+  let d = `M${x0} ${y}`;
+  for (let x = x0; x + w * 2 <= x1; x += w * 2) d += ` h${w} v-${h} h${w} v${h}`;
+  return `${d} H${x1}`;
+}
+const towerArches = (xs: number[], yBase: number, w: number, h: number) =>
+  xs.map((x) => `M${x} ${yBase} V${yBase - h + w / 2} a${w / 2} ${w / 2} 0 0 1 ${w} 0 V${yBase}`).join(" ");
+
+const art: Record<Props["motif"], { vb: string; d: string }> = {
+  "tour-lu": {
+    vb: "0 0 120 262",
+    d: [
+      "M14 260 H106", // sol
+      "M22 260 V172 H98 V260", // base
+      towerArches([31, 52, 73], 252, 16, 56),
+      "M18 172 H102 M30 172 V112 H90 V172", // corniche + étage
+      "M38 168 V118 M50 168 V118 M70 168 V118 M82 168 V118", // colonnes
+      "M26 112 H94 M36 112 V84 H84 V112", // tambour
+      "M32 84 H88 M36 84 Q60 30 84 84", // dôme
+      "M53 46 V36 H67 V46 M53 36 Q60 24 67 36 M60 25 V8", // lanterne + flèche
+      "M42 98 a4 4 0 0 1 8 0 v8 h-8 Z M70 98 a4 4 0 0 1 8 0 v8 h-8 Z", // oculi
+    ].join(" "),
+  },
+  chateau: {
+    vb: "0 0 320 170",
+    d: [
+      "M0 160 H320", // sol
+      // tour gauche
+      `M12 160 V66 ${crenels(12, 66, 66).slice(`M12 66`.length)} V160 M12 78 H66`,
+      // courtine
+      `M66 160 V96 ${crenels(66, 124, 96).slice(`M66 96`.length)}`,
+      // châtelet d'entrée (deux tours + porte)
+      `M124 160 V48 ${crenels(124, 196, 48).slice(`M124 48`.length)} V160 M124 62 H196`,
+      "M144 160 V128 a16 16 0 0 1 32 0 V160", // porte
+      "M136 92 v14 M184 92 v14 M160 76 v12", // archères
+      // courtine droite
+      `M196 160 V96 ${crenels(196, 254, 96).slice(`M196 96`.length)}`,
+      // tour droite
+      `M254 160 V66 ${crenels(254, 308, 66).slice(`M254 66`.length)} V160 M254 78 H308`,
+      "M118 160 Q160 166 202 160", // douves
+    ].join(" "),
+  },
+  cathedrale: {
+    vb: "0 0 210 240",
+    d: [
+      "M0 232 H210",
+      // tours
+      "M30 232 V34 H82 V232 M128 232 V34 H180 V232",
+      "M26 34 H86 M124 34 H184 M30 46 H82 M128 46 H180", // couronnements
+      towerArches([44, 58], 120, 10, 52), towerArches([142, 156], 120, 10, 52), // baies
+      // nef / pignon
+      "M82 120 L105 88 L128 120 M82 120 H128",
+      "M98 108 a7 7 0 0 1 14 0", // rosace
+      // portails
+      "M93 232 V188 a12 12 0 0 1 24 0 V232",
+      "M44 232 V198 a12 12 0 0 1 24 0 V232 M142 232 V198 a12 12 0 0 1 24 0 V232",
+      "M24 150 H88 M122 150 H186", // corniches
+    ].join(" "),
+  },
+  grue: {
+    vb: "0 0 300 240",
+    d: [
+      "M0 232 H300",
+      // pylône en treillis
+      "M74 232 V66 M100 232 V66",
+      Array.from({ length: 8 }, (_, i) => `M74 ${232 - i * 21} L100 ${211 - i * 21}`).join(" "),
+      "M64 232 L74 210 M110 232 L100 210", // pieds
+      "M62 66 H112 V46 H62 Z", // cabine
+      "M86 46 V8", // mât
+      // flèche en treillis
+      "M112 52 H292 M112 64 H284 M284 64 L292 52",
+      Array.from({ length: 9 }, (_, i) => `M${116 + i * 19} 64 L${125 + i * 19} 52`).join(" "),
+      // contre-flèche + contrepoids
+      "M62 52 H14 M62 62 H22 M14 52 V74 H38 V62",
+      // haubans
+      "M86 8 L292 52 M86 8 L14 52",
+      // câble + crochet
+      "M250 64 V150 M244 150 H256 M250 150 v8 a6 6 0 1 1 -6 6",
+    ].join(" "),
+  },
+  elephant: {
+    vb: "0 0 280 210",
+    d: [
+      "M0 202 H280",
+      // corps
+      "M68 128 Q62 70 124 66 H190 Q214 68 218 100 V128",
+      // pattes articulées
+      "M78 126 V200 H98 V130 M112 130 V200 H132 V128 M176 128 V200 H196 V128 M204 126 V200 H222 V122",
+      // tête, oreille, trompe, défense
+      "M212 72 Q252 66 252 106 Q252 124 240 132",
+      "M222 80 Q206 100 220 122",
+      "M246 120 Q258 156 242 182 Q234 190 228 182",
+      "M236 132 Q244 146 258 144",
+      "M236 92 a2 2 0 1 0 0.1 0",
+      // queue
+      "M68 92 Q52 104 56 130",
+      // nacelle sur le dos
+      "M110 66 V40 H178 V66 M104 40 H184 M124 40 V66 M144 40 V66 M164 40 V66",
+      "M100 40 L144 26 L188 40", // toit
+    ].join(" "),
+  },
+  loire: {
+    vb: "0 0 600 80",
+    d: [10, 30, 50]
+      .map((y, i) => {
+        let d = `M0 ${y}`;
+        for (let x = 0; x < 600; x += 60) d += ` q15 ${i % 2 ? 8 : -8} 30 0 t30 0`;
+        return d;
+      })
+      .join(" "),
+  },
+};
+const { vb, d } = art[motif];
+---
+
+<span class:list={["hm", className]} style={`--hm-size:${size}`} aria-hidden="true">
+  <svg viewBox={vb} fill="none" focusable="false" preserveAspectRatio="xMidYMax meet">
+    <path d={d} stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
+  </svg>
+</span>
+
+<style>
+  .hm {
+    position: absolute; z-index: -1; pointer-events: none; user-select: none;
+    width: var(--hm-size); line-height: 0;
+    color: currentColor; opacity: var(--hm-opacity, 0.07);
+  }
+  .hm svg { width: 100%; height: auto; overflow: visible; }
+  :global([data-theme="dark"]) .hm { --hm-opacity: 0.09; }
+  .hm--br { right: clamp(-2rem, -1vw, 0rem); bottom: 0; }
+  .hm--bl { left: clamp(-2rem, -1vw, 0rem); bottom: 0; }
+  .hm--tr { right: clamp(-1rem, 2vw, 3rem); top: clamp(2rem, 6vw, 5rem); }
+  .hm--tl { left: clamp(-1rem, 2vw, 3rem); top: clamp(2rem, 6vw, 5rem); }
+  .hm--bottom { left: 0; right: 0; bottom: 0; width: 100%; }
+  .hm--mid { left: 46%; bottom: 0; }
+  /* Derrière le grand titre de l'accueil, décalé vers la droite pour dépasser des lettres */
+  .hm--hero-title { left: clamp(6rem, 20vw, 22rem); top: calc(var(--header-h) + clamp(3rem, 8vh, 6rem)); }
+  @media (max-width: 900px) { .hm--hero-title { left: auto; right: -8%; top: calc(var(--header-h) + 2.5rem); } }
+  @media (max-width: 900px) { .hm--mid { left: auto; right: 4%; } }
+  @media (max-width: 700px) { .hm { width: calc(var(--hm-size) * 0.75); } }
+</style>

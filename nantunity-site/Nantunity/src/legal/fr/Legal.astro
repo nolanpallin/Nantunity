@@ -1,0 +1,47 @@
+---
+import F from "../F.astro";
+import { site } from "../../data/site";
+import { url } from "../../i18n";
+const L = site.legal;
+---
+
+<p>Conformément à l’article 6-III de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l’économie numérique (LCEN), les informations suivantes sont portées à la connaissance des utilisateurs du site <strong>{site.url.replace("https://", "")}</strong>.</p>
+
+<h2>1. Éditeur du site</h2>
+<ul>
+  <li><strong>Dénomination :</strong> <F v={L.legalName} /></li>
+  <li><strong>Forme juridique :</strong> <F v={L.legalForm} /></li>
+  <li><strong>Déclaration :</strong> <F v={L.declaration} /></li>
+  <li><strong>Numéro RNA :</strong> <F v={L.rna} /></li>
+  <li><strong>SIRET :</strong> <F v={L.siret} /></li>
+  <li><strong>TVA :</strong> <F v={L.vat} /></li>
+  <li><strong>Siège social :</strong> <F v={L.headOffice} /></li>
+  <li><strong>E-mail :</strong> <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></li>
+  {site.contact.phone && <li><strong>Téléphone :</strong> {site.contact.phone}</li>}
+</ul>
+<p>
+  <mark class="todo-field">[À vérifier : l’appellation « Junior-Entreprise » est une marque protégée de la Confédération Nationale des Junior-Entreprises (CNJE). Préciser ici le statut de l’association au sein du mouvement (Junior-Entreprise, Junior-Création…) ou adapter les mentions du site.]</mark>
+</p>
+
+<h2>2. Directeur·rice de la publication</h2>
+<p><F v={L.publisher} /> — joignable à l’adresse <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.</p>
+
+<h2>3. Hébergement</h2>
+<ul>
+  <li><strong>Hébergeur :</strong> <F v={L.host.name} /></li>
+  <li><strong>Adresse :</strong> <F v={L.host.address} /></li>
+  <li><strong>Téléphone :</strong> <F v={L.host.phone} /></li>
+</ul>
+
+<h2>4. Propriété intellectuelle</h2>
+<p>L’ensemble des éléments du site (logo, textes, visuels, mise en page, code) est la propriété de {L.legalName} ou fait l’objet d’une autorisation d’utilisation. Toute reproduction, représentation, modification ou adaptation, totale ou partielle, sans autorisation écrite préalable est interdite (articles L.122-4 et suivants du Code de la propriété intellectuelle).</p>
+<p>Les polices de caractères utilisées (Anton, Fraunces, Roboto) sont distribuées sous licence SIL Open Font License et hébergées directement sur le site.</p>
+
+<h2>5. Responsabilité</h2>
+<p>{L.legalName} s’efforce de fournir des informations exactes et à jour, sans pouvoir garantir l’absence d’erreurs ou d’omissions. Le site peut contenir des liens vers des sites tiers dont {L.legalName} ne maîtrise pas le contenu et n’assume pas la responsabilité.</p>
+
+<h2>6. Données personnelles et cookies</h2>
+<p>Le traitement de vos données personnelles est détaillé dans la <a href={url("privacy", "fr")}>politique de confidentialité</a>. L’utilisation des cookies et traceurs est décrite dans la <a href={url("cookies", "fr")}>politique cookies</a>.</p>
+
+<h2>7. Droit applicable</h2>
+<p>Les présentes mentions légales sont régies par le droit français. Pour toute question, vous pouvez nous écrire à <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.</p>

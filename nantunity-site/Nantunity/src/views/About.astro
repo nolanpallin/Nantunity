@@ -1,0 +1,115 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Heritage from "../components/Heritage.astro";
+import Logo from "../components/Logo.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { getPoles, poleVars } from "../data/poles";
+import { useT, url, rich, type Lang } from "../i18n";
+
+interface Props { lang: Lang; alternates: Record<Lang, string> }
+const { lang, alternates } = Astro.props;
+const t = useT(lang);
+const a = t.about;
+const poles = getPoles(lang);
+---
+
+<BaseLayout lang={lang} alternates={alternates} title={a.title} description={a.description} headerTone="dark">
+  <section class="page-hero theme-orange ahero">
+    <div class="container ahero__grid">
+      <div>
+        <p class="label ahero__label" data-reveal>{a.title}</p>
+        <h1 class="page-hero__title display lines">
+          <span class="line"><span>{a.h1[0]}</span></span>
+          <span class="line"><span>{a.h1[1]}</span></span>
+          <span class="line"><span class="serif-i ahero__accent">{a.h1[2]}</span></span>
+        </h1>
+      </div>
+      <div class="ahero__logo" data-reveal="scale" style="--d:2" data-parallax="0.08">
+        <Logo variant="wordmark" label="Nant'Unity" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section theme-paper story has-motif">
+    <div class="container story__grid">
+      <p class="label" data-reveal>{a.storyLabel}</p>
+      <div>
+        <p class="story__big" data-reveal set:html={rich(a.storyBig)} />
+        <div class="story__cols" data-reveal style="--d:1">
+          <p set:html={rich(a.storyName)} />
+          <p><span class="todo">{a.storyTodo}</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section theme-ink concept">
+    <div class="container concept__grid">
+      <article class="concept__card" data-reveal>
+        <p class="label text-orange">{a.conceptLabel}</p>
+        <h2 class="display">{a.conceptTitle} <span class="serif-i text-orange">{a.conceptAccent}</span></h2>
+        <p class="muted">{a.conceptText}</p>
+      </article>
+      <article class="concept__card" data-reveal style="--d:1">
+        <p class="label text-orange">{a.visionLabel}</p>
+        <h2 class="display">{a.visionTitle} <span class="serif-i text-orange">{a.visionAccent}</span> {a.visionEnd}</h2>
+        <p class="muted">{a.visionText}</p>
+      </article>
+    </div>
+    <div class="concept__poles">
+      {poles.map((p) => <a href={url("poles", lang, p.urlSlug)} style={poleVars(p)}>{p.short}</a>)}
+    </div>
+  </section>
+
+  <section class="section theme-white vals has-motif">
+    <div class="container">
+      <p class="label" data-reveal>{a.valuesLabel}</p>
+      <ul class="vals__grid" role="list">
+        {
+          t.values.map((v, i) => (
+            <li class="val" data-reveal style={`--d:${i}`}>
+              <span class="val__num label">0{i + 1}</span>
+              <h3 class:list={["val__title", i % 2 ? "serif-i" : "display"]}>{v.title}</h3>
+              <p>{v.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} title={a.ctaTitle} accent={a.ctaAccent} text={a.ctaText} button={a.ctaButton} secondary={false} apostrophe={false} />
+</BaseLayout>
+
+<style>
+  .ahero__grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--space-7); align-items: end; }
+  .ahero__label { margin-bottom: var(--space-5); }
+  .ahero .page-hero__title .ahero__accent { color: var(--c-black); }
+  .ahero__logo { color: var(--c-black); max-width: 360px; justify-self: end; width: 100%; }
+  @media (max-width: 860px) { .ahero__grid { grid-template-columns: 1fr; } .ahero__logo { justify-self: start; max-width: 200px; } }
+
+  .story__grid { display: grid; grid-template-columns: 1fr 3fr; gap: var(--gutter); }
+  .story__big { font-size: var(--fs-2xl); line-height: 1.25; font-weight: 500; font-stretch: 95%; }
+  .story__big :global(.serif-i) { color: var(--accent-display); }
+  .story__cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gutter); margin-top: var(--space-7); color: var(--fg-muted); }
+  .todo { display: inline-block; padding: 0.75rem 1rem; border: 1.5px dashed var(--line-strong); border-radius: var(--radius-m); font-size: var(--fs-sm); }
+  @media (max-width: 860px) { .story__grid, .story__cols { grid-template-columns: 1fr; } }
+
+  .concept { overflow: hidden; }
+  .concept__grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gutter); }
+  .concept__card { display: grid; gap: var(--space-5); align-content: start; padding: clamp(1.5rem, 4vw, 3.5rem); border: 1px solid var(--line); border-radius: var(--radius-l); }
+  .concept__card h2 { font-size: var(--fs-2xl); line-height: 1; }
+  .concept__poles { display: flex; margin-top: var(--space-9); }
+  .concept__poles a { flex: 1; background: var(--pole-bg); color: var(--pole-title); font-family: var(--f-display); text-transform: uppercase; font-size: clamp(1.25rem, 3vw, 3rem); padding: 1.25rem var(--gutter); line-height: 1; transition: flex var(--dur-slow) var(--ease-out); overflow: hidden; white-space: nowrap; }
+  .concept__poles a:hover, .concept__poles a:focus-visible { flex: 2; }
+  @media (max-width: 860px) { .concept__grid { grid-template-columns: 1fr; } .concept__poles { flex-wrap: wrap; } .concept__poles a { flex: 1 1 50%; } }
+
+  .vals__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: var(--space-6); }
+  .val { padding: 1.75rem; border-radius: var(--radius-m); background: var(--surface-2); display: grid; gap: 1rem; align-content: start; transition: background var(--dur), color var(--dur), transform var(--dur) var(--ease-out); }
+  .val:hover { background: var(--c-orange); color: var(--c-black); transform: translateY(-6px); }
+  .val__title { font-size: clamp(2.25rem, 1.5rem + 2vw, 3.5rem); line-height: 1; margin-top: 2.5rem; }
+  .val p { color: var(--fg-muted); }
+  .val:hover p { color: var(--c-black); }
+  @media (max-width: 960px) { .vals__grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .vals__grid { grid-template-columns: 1fr; } }
+</style>

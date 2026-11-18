@@ -1,0 +1,80 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../data/site";
+import { url, type Lang, type RouteKey } from "../i18n";
+import LegalFr from "../legal/fr/Legal.astro";
+import PrivacyFr from "../legal/fr/Privacy.astro";
+import CookiesFr from "../legal/fr/Cookies.astro";
+import TermsFr from "../legal/fr/Terms.astro";
+import SalesFr from "../legal/fr/Sales.astro";
+import LegalEn from "../legal/en/Legal.astro";
+import PrivacyEn from "../legal/en/Privacy.astro";
+import CookiesEn from "../legal/en/Cookies.astro";
+import TermsEn from "../legal/en/Terms.astro";
+import SalesEn from "../legal/en/Sales.astro";
+
+interface Props { lang: Lang; alternates: Record<Lang, string>; doc: RouteKey }
+const { lang, alternates, doc } = Astro.props;
+
+const docs = {
+  legal: { fr: ["Mentions", "légales", LegalFr], en: ["Legal", "notice", LegalEn] },
+  privacy: { fr: ["Politique de", "confidentialité", PrivacyFr], en: ["Privacy", "policy", PrivacyEn] },
+  cookies: { fr: ["Politique", "cookies", CookiesFr], en: ["Cookie", "policy", CookiesEn] },
+  terms: { fr: ["Conditions générales", "d’utilisation", TermsFr], en: ["Terms", "of use", TermsEn] },
+  sales: { fr: ["Conditions générales", "de vente", SalesFr], en: ["Terms", "of sale", SalesEn] },
+} as const;
+const [t1, t2, Doc] = docs[doc as keyof typeof docs][lang];
+const date = new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-GB", { dateStyle: "long" }).format(new Date(site.legal.lastUpdate));
+const others = (Object.keys(docs) as (keyof typeof docs)[]).filter((k) => k !== doc);
+const desc = lang === "fr" ? `${t1} ${t2} du site de Nant'Unity, Junior-Entreprise à Nantes.` : `${t1} ${t2} for the Nant'Unity website.`;
+---
+
+<BaseLayout lang={lang} alternates={alternates} title={`${t1} ${t2}`} description={desc} headerTone="auto">
+  <section class="page-hero theme-paper lhero">
+    <div class="container container--narrow">
+      <p class="page-hero__label label">{lang === "fr" ? "Informations légales" : "Legal"}</p>
+      <h1 class="page-hero__title display">{t1} <span class="serif-i">{t2}</span></h1>
+      <p class="lhero__date">{lang === "fr" ? "Dernière mise à jour :" : "Last updated:"} {date}</p>
+      <div class="lhero__notice" role="note">
+        {
+          lang === "fr"
+            ? <p><strong>Document à faire valider avant la mise en ligne.</strong> Les éléments <mark class="todo-field">surlignés</mark> sont à compléter par l’association.</p>
+            : <p><strong>This English version is provided for information only; the French version prevails.</strong> Translation pending legal validation. <mark class="todo-field">Highlighted</mark> items are to be completed by the association.</p>
+        }
+      </div>
+    </div>
+  </section>
+  <section class="section theme-paper legal">
+    <div class="container container--narrow">
+      <article class="prose legal__body">
+        <Doc />
+      </article>
+      <nav class="legal__nav" aria-label={lang === "fr" ? "Autres documents" : "Other documents"}>
+        {others.map((k) => <a href={url(k, lang)} class="chip">{docs[k][lang][0]} {docs[k][lang][1]}</a>)}
+      </nav>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .lhero { padding-bottom: 2rem; }
+  .lhero .page-hero__title { font-size: var(--fs-3xl); }
+  .lhero .page-hero__title .serif-i { color: var(--accent-display); }
+  .lhero .page-hero__label { color: var(--accent-text); }
+  .lhero__date { margin-top: 1.25rem; color: var(--fg-muted); font-size: var(--fs-sm); }
+  .lhero__notice { margin-top: 1.5rem; padding: 1rem 1.25rem; border-left: 4px solid var(--c-orange); background: var(--surface); border-radius: 0 var(--radius-m) var(--radius-m) 0; font-size: var(--fs-sm); }
+  .legal { padding-top: 1rem; }
+  .legal__body { font-size: var(--fs-base); }
+  .legal__body :global(h2) { font-size: var(--fs-xl); margin-top: 2.2em; }
+  .legal__body :global(h3) { font-size: var(--fs-lg); }
+  .legal__body :global(ul) { padding-left: 1.2em; }
+  .legal__body :global(.table-wrap) { overflow-x: auto; }
+  .legal__body :global(table) { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+  .legal__body :global(th), .legal__body :global(td) { text-align: left; padding: 0.75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .legal__body :global(th) { font-weight: 700; background: var(--surface); }
+  .legal__body :global(code) { font-size: 0.9em; background: var(--surface); padding: 0.1em 0.4em; border-radius: 4px; }
+  .legal__body :global(.legal-warning) { padding: 1.25rem; border-radius: var(--radius-m); border: 1.5px dashed var(--accent-display); font-size: var(--fs-sm); }
+  .legal__nav { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--line); }
+  .legal__nav .chip { border-color: var(--line-strong); transition: background var(--dur-fast), color var(--dur-fast); }
+  .legal__nav .chip:hover { background: var(--fg); color: var(--bg-paper); }
+</style>

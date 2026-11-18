@@ -1,0 +1,60 @@
+---
+import Arrow from "./Arrow.astro";
+import { useT, url, type Lang } from "../i18n";
+interface Props {
+  lang: Lang;
+  title?: string;
+  accent?: string;
+  text?: string;
+  href?: string;
+  button?: string;
+  tone?: "orange" | "pole";
+  secondary?: boolean;
+  /** Apostrophe signature (’) après le mot d'accent */
+  apostrophe?: boolean;
+}
+const { lang, tone = "orange", secondary = true, apostrophe = true } = Astro.props;
+const t = useT(lang);
+const title = Astro.props.title ?? t.cta.title;
+const accent = Astro.props.accent ?? t.cta.accent;
+const text = Astro.props.text ?? t.cta.text;
+const href = Astro.props.href ?? url("contact", lang);
+const button = Astro.props.button ?? t.common.quote;
+---
+
+<section class:list={["cta section", tone === "orange" ? "theme-orange" : "theme-pole"]}>
+  <div class="cta__shape" aria-hidden="true" data-parallax="0.12"></div>
+  <div class="container cta__inner">
+    <h2 class="cta__title display lines">
+      <span class="line"><span>{title}</span></span>
+      <span class="line"><span class="serif-i">{accent}{apostrophe && "’"}</span></span>
+    </h2>
+    <div class="cta__side" data-reveal>
+      <p class="cta__text">{text}</p>
+      <div class="cta__actions">
+        <a href={href} class:list={["btn", tone === "orange" ? "btn--dark" : "btn--pole"]} data-magnetic>{button} <Arrow /></a>
+        {secondary && <a href={url("booking", lang)} class="btn btn--ghost">{t.common.book}</a>}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta { overflow: hidden; }
+  .cta__inner { position: relative; display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--space-7); align-items: end; }
+  .cta__title { font-size: clamp(3.25rem, 1rem + 8vw, 10rem); line-height: 0.86; }
+  .cta__title .line > span { white-space: nowrap; }
+  .cta__title .serif-i { font-size: 0.78em; line-height: 1.05; }
+  .theme-pole .cta__title { color: var(--pole-ink); }
+  .theme-pole .cta__title .serif-i { color: var(--pole-title); }
+  .cta__text { font-size: var(--fs-lg); margin-bottom: var(--space-6); max-width: 34ch; }
+  .cta__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .cta__shape {
+    position: absolute; right: -6vw; top: -20%; width: 34vw; height: 140%;
+    border: clamp(30px, 5vw, 80px) solid currentColor; border-top: 0;
+    border-radius: var(--radius-u);
+    opacity: 0.08;
+  }
+  @media (max-width: 860px) { .cta__inner { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) { .cta__title .line > span { white-space: normal; } }
+</style>

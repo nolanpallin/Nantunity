@@ -1,0 +1,38 @@
+---
+/**
+ * Bandeau défilant infini. L'apostrophe ’ du logo sert de séparateur.
+ * - Défilement continu, jamais interrompu (y compris au survol).
+ * - Chaque piste répète la liste plusieurs fois pour être toujours plus large que l'écran :
+ *   aucune zone vide, même sur très grand écran ou avec une liste courte.
+ * - La vitesse est proportionnelle à la longueur du contenu (pixels/seconde constants).
+ */
+interface Props { items: string[]; class?: string; speed?: number; duration?: number }
+const { items, class: className = "", speed = 1 } = Astro.props;
+const minItems = 12;
+const repeat = Math.max(2, Math.ceil(minItems / items.length));
+const sequence = Array.from({ length: repeat }, () => items).flat();
+const chars = sequence.join("").length;
+const duration = Math.round((chars * 0.6) / speed); // ≈ 65 px/s, vitesse constante quelle que soit la liste
+---
+
+<div class:list={["marquee mq", className]} style={`--marquee-dur:${duration}s`} aria-hidden="true">
+  {
+    [0, 1].map(() => (
+      <div class="marquee__track">
+        {sequence.map((it) => (
+          <>
+            <span class="mq__item display">{it}</span>
+            <span class="mq__sep serif">’</span>
+          </>
+        ))}
+      </div>
+    ))
+  }
+</div>
+<p class="visually-hidden">{items.join(", ")}</p>
+
+<style>
+  .mq { padding-block: 1.1rem; }
+  .mq__item { font-size: clamp(2rem, 1.2rem + 3.5vw, 4.5rem); padding-inline: 0.4em; white-space: nowrap; }
+  .mq__sep { display: inline-block; flex: none; padding-inline: 0.15em; font-size: clamp(2.6rem, 1.5rem + 4.5vw, 6rem); line-height: 0.5; transform: translateY(0.18em); }
+</style>

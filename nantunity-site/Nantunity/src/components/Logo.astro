@@ -1,0 +1,44 @@
+---
+/**
+ * Logo Nant'Unity — tracés vectoriels extraits tels quels du PDF fourni (non redessinés).
+ * La couleur suit `color` (currentColor), ce qui permet de reprendre les duos de couleurs officiels.
+ *  - variant="wordmark" : Nant’ + UNITY
+ *  - variant="full"     : logo principal avec la signature « Communication et image »
+ *  - variant="<slug de pôle>" : déclinaison du pôle avec sa signature
+ */
+const files = import.meta.glob("../assets/logo/*.svg", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
+
+const map: Record<string, string> = {
+  wordmark: "logo-wordmark.svg",
+  full: "logo-p1-full.svg",
+  strategie: "logo-p2-full.svg",
+  audiovisuel: "logo-p3-full.svg",
+  web: "logo-p4-full.svg",
+  graphique: "logo-p5-full.svg",
+  evenementiel: "logo-p6-full.svg",
+};
+
+interface Props {
+  variant?: keyof typeof map | string;
+  class?: string;
+  label?: string;
+  decorative?: boolean;
+}
+const { variant = "wordmark", class: className = "", label = "Nant'Unity", decorative = false } = Astro.props;
+
+let svg = files[`../assets/logo/${map[variant] ?? map.wordmark}`] ?? "";
+// Identifiants uniques par instance (plusieurs logos sur une même page)
+const uid = Math.random().toString(36).slice(2, 7);
+svg = svg.replace(/(id="|#)(p\d_)/g, `$1$2${uid}_`);
+svg = svg.replace(
+  "<svg ",
+  decorative ? `<svg aria-hidden="true" focusable="false" ` : `<svg role="img" aria-label="${label}" focusable="false" `,
+);
+---
+
+<span class:list={["logo", className]} set:html={svg} />
+
+<style>
+  .logo { display: inline-block; line-height: 0; }
+  .logo :global(svg) { width: 100%; height: auto; overflow: visible; }
+</style>

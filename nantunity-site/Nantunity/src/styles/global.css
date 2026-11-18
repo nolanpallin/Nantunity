@@ -1,0 +1,298 @@
+@import "./tokens.css";
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+* { margin: 0; }
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+body {
+  font-family: var(--f-sans);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  color: var(--fg);
+  background: var(--bg-paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+img, svg, video { display: block; max-width: 100%; }
+img { height: auto; }
+input, button, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+a { color: inherit; text-decoration: none; }
+ul[role="list"], ol[role="list"] { list-style: none; padding: 0; }
+h1, h2, h3, h4 { font-weight: 400; line-height: var(--lh-snug); text-wrap: balance; }
+p { text-wrap: pretty; }
+::selection { background: var(--c-orange); color: var(--c-black); }
+:focus-visible { outline: none; box-shadow: var(--focus); border-radius: var(--radius-s); }
+
+/* ---------- Transitions entre pages (View Transitions natives) ---------- */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: vt-out 280ms var(--ease-in-out) both; }
+::view-transition-new(root) { animation: vt-in 520ms var(--ease-out) both; }
+@keyframes vt-out { to { opacity: 0; transform: translateY(-12px); } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(18px); } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}
+
+/* ---------- Mise en page ---------- */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.container--narrow { max-width: calc(var(--container-narrow) + 2 * var(--gutter)); }
+.section { padding-block: var(--section-y); position: relative; }
+
+/* Thèmes de section : trois tons qui suivent le thème clair/sombre (paper, white, ink),
+   et deux tons identitaires fixes (orange, couleur du pôle). */
+.theme-paper { background: var(--bg-paper); color: var(--fg); }
+.theme-white { background: var(--bg-white); color: var(--fg); }
+.theme-ink { background: var(--bg-ink); color: var(--fg); }
+.theme-orange {
+  background: var(--c-orange); color: var(--c-black);
+  --fg: var(--c-black); --fg-muted: rgb(0 0 0 / 0.72); --line: rgb(0 0 0 / 0.18); --line-strong: rgb(0 0 0 / 0.4);
+  --accent-text: var(--c-black); --accent-display: var(--c-black); --logo: var(--c-black);
+}
+.theme-pole { background: var(--pole-bg); color: var(--pole-ink); --fg: var(--pole-ink); --line: color-mix(in srgb, var(--pole-ink) 22%, transparent); }
+
+/* Section accueillant un motif du patrimoine nantais en arrière-plan (cf. components/Heritage.astro) */
+.has-motif { position: relative; isolation: isolate; overflow: clip; } /* clip (et non hidden) : préserve les éléments « sticky » */
+/* Transition douce lors du changement de thème (si View Transitions indisponible) */
+html.theme-switching, html.theme-switching * {
+  transition: background-color 450ms var(--ease-out), color 450ms var(--ease-out), border-color 450ms var(--ease-out) !important;
+}
+html.vt-theme::view-transition-old(root), html.vt-theme::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+html.vt-theme::view-transition-new(root) { z-index: 2; }
+
+/* ---------- Typographie ---------- */
+.display {
+  font-family: var(--f-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: var(--lh-tight);
+  letter-spacing: 0.005em;
+}
+/* Accent serif : Fraunces italique, axe « SOFT » pour des formes plus douces et lisibles */
+.serif { font-family: var(--f-serif); font-weight: 400; text-transform: none; letter-spacing: -0.01em; font-variation-settings: "SOFT" 50, "WONK" 0; }
+.serif-i { font-family: var(--f-serif); font-style: italic; font-weight: 400; text-transform: none; letter-spacing: -0.015em; font-variation-settings: "SOFT" 100, "WONK" 0; }
+
+/* Titres : pas d'italique cursive. Les mots d'accent des titres gardent leur couleur
+   mais reprennent la police des titres (capitales condensées), à la même taille.
+   (!important : neutralise les tailles/interlignes réduits définis pour l'ancienne italique) */
+:is(h1, h2, h3, .display) .serif-i,
+:is(h1, h2, h3).serif-i {
+  font-family: var(--f-display) !important;
+  font-style: normal !important;
+  font-weight: 400;
+  font-variation-settings: normal;
+  text-transform: uppercase !important;
+  letter-spacing: 0.005em;
+  font-size: 1em !important;
+  line-height: inherit !important;
+}
+.label {
+  font-family: var(--f-sans);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  line-height: 1.4;
+}
+.lead { font-size: var(--fs-lg); line-height: 1.5; max-width: 38ch; }
+.muted { color: var(--fg-muted); }
+.text-orange { color: var(--accent-display); }
+.label.text-orange { color: var(--accent-text); }
+.text-accent { color: var(--pole-text, var(--accent-display)); }
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- Lien d'évitement ---------- */
+.skip-link {
+  position: fixed; top: 0.75rem; left: 0.75rem; z-index: 1000;
+  padding: 0.75rem 1.25rem; background: var(--c-orange); color: var(--c-black);
+  font-weight: 700; border-radius: var(--radius-pill);
+  transform: translateY(-160%); transition: transform var(--dur) var(--ease-out);
+}
+.skip-link:focus { transform: none; }
+
+/* ---------- Boutons ---------- */
+.btn {
+  --btn-bg: var(--c-orange);
+  --btn-fg: var(--c-black);
+  position: relative;
+  display: inline-flex; align-items: center; gap: 0.75rem;
+  padding: 1rem 1.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--btn-bg); color: var(--btn-fg);
+  font-family: var(--f-sans); font-weight: 700; font-size: var(--fs-sm);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  overflow: hidden; isolation: isolate;
+  transition: color 220ms ease;
+}
+/* Survol : le bouton reste immobile ; seules ses couleurs changent, en fondu */
+.btn::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: var(--btn-hover-bg, var(--inverse-bg));
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+.btn:hover::before, .btn:focus-visible::before { opacity: 1; }
+.btn:hover, .btn:focus-visible { color: var(--btn-hover-fg, var(--inverse-fg)); }
+/* Bouton « négatif » : noir en mode clair, clair en mode sombre */
+.btn--dark { --btn-bg: var(--inverse-bg); --btn-fg: var(--inverse-fg); --btn-hover-bg: var(--c-orange); --btn-hover-fg: var(--c-black); }
+.theme-orange .btn--dark { --btn-bg: var(--c-black); --btn-fg: var(--c-white); --btn-hover-bg: var(--c-white); --btn-hover-fg: var(--c-black); }
+.btn--pole { --btn-bg: var(--pole-accent); --btn-fg: var(--pole-on-accent); --btn-hover-bg: var(--c-white); --btn-hover-fg: var(--c-black); }
+/* Bouton à contour. La couleur du contour et du remplissage au survol est figée dans --ghost
+   (et non currentColor, qui change au survol et rendait fond et texte identiques → bouton invisible). */
+.btn--ghost {
+  --ghost: var(--fg);
+  --btn-bg: transparent; --btn-fg: var(--ghost); --btn-hover-bg: var(--ghost); --btn-hover-fg: var(--bg-paper);
+  box-shadow: inset 0 0 0 1.5px var(--ghost);
+}
+.theme-white .btn--ghost { --btn-hover-fg: var(--bg-white); }
+.theme-ink .btn--ghost { --btn-hover-fg: var(--bg-ink); }
+.theme-orange .btn--ghost { --ghost: var(--c-black); --btn-hover-fg: var(--c-orange); }
+.theme-pole .btn--ghost { --ghost: var(--pole-ink); --btn-hover-fg: var(--pole-bg); }
+
+/* États clavier et clic, communs à tous les boutons */
+.btn:focus-visible { outline: 3px solid var(--c-orange); outline-offset: 3px; box-shadow: none; }
+.btn--ghost:focus-visible { box-shadow: inset 0 0 0 1.5px var(--ghost); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn:disabled::before { display: none; }
+
+/* Lien souligné animé */
+.link-u {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0% 1.5px no-repeat;
+  transition: background-size var(--dur) var(--ease-out);
+  padding-bottom: 2px;
+}
+.link-u:hover, .link-u[aria-current="page"] { background-size: 100% 1.5px; }
+
+/* Puce / tag */
+.chip {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.45rem 0.9rem; border-radius: var(--radius-pill);
+  border: 1.5px solid currentColor;
+  font-size: var(--fs-sm); font-weight: 600; line-height: 1.2;
+}
+.dot { width: 0.6em; height: 0.6em; border-radius: 50%; background: var(--pole-bg, var(--c-orange)); flex: none; }
+
+/* Badge « contenu temporaire » */
+.badge-temp {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.3rem 0.7rem; border-radius: var(--radius-pill);
+  background: var(--inverse-bg); color: var(--inverse-fg);
+  font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.badge-temp::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c-orange); }
+
+/* ---------- Animations d'apparition ---------- */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+  transition-delay: calc(var(--d, 0) * 90ms);
+}
+.js [data-reveal="fade"] { transform: none; }
+.js [data-reveal="scale"] { transform: scale(0.94); }
+.js [data-reveal].is-in { opacity: 1; transform: none; }
+
+/* Texte révélé ligne par ligne */
+/* padding haut/bas : laisse respirer les accents des capitales (É, Ô) et les jambages
+   de l'italique Fraunces (g, y, p) malgré l'interlignage serré */
+.lines > .line { display: block; overflow: hidden; padding-block: 0.16em 0.2em; margin-block: -0.16em -0.2em; }
+.lines > .line > span { display: inline-block; }
+.js .lines > .line > span {
+  transform: translateY(105%);
+  transition: transform 1s var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 110ms + 80ms);
+}
+.js .lines.is-in > .line > span { transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal], .js .lines > .line > span { opacity: 1; transform: none; transition: none; }
+}
+
+/* ---------- Défilement continu (marquee) ----------
+   Deux pistes identiques côte à côte : quand la 1re a défilé de 100 %, la 2e est exactement à sa place
+   → boucle sans saut. Le défilement ne s'arrête jamais (pas de pause au survol). */
+.marquee { display: flex; overflow: hidden; user-select: none; }
+.marquee__track {
+  display: flex; flex: none; align-items: center; gap: 0;
+  animation: marquee var(--marquee-dur, 32s) linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+@keyframes marquee { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-100%, 0, 0); } }
+@media (prefers-reduced-motion: reduce) { .marquee__track { animation: none; } }
+
+/* ---------- En-tête de page générique ---------- */
+.page-hero {
+  padding-top: calc(var(--header-h) + clamp(3rem, 2rem + 6vw, 8rem));
+  padding-bottom: clamp(3rem, 2rem + 5vw, 7rem);
+  position: relative;
+  overflow: hidden;
+}
+.page-hero__title { font-size: var(--fs-4xl); }
+.page-hero__title .serif-i { color: var(--accent-display); font-size: 0.82em; }
+.page-hero__intro { margin-top: var(--space-6); max-width: 46ch; font-size: var(--fs-lg); }
+.page-hero__label { display: flex; align-items: center; gap: 0.75rem; margin-bottom: var(--space-5); color: var(--accent-text); }
+.page-hero__label::before { content: ""; width: 2.5rem; height: 1.5px; background: currentColor; }
+
+/* Fil d'Ariane */
+.breadcrumb { display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: var(--fs-sm); opacity: 0.75; margin-bottom: var(--space-5); }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb li + li::before { content: "/"; margin-right: 0.5rem; opacity: 0.5; }
+
+/* Contenu riche (markdown des projets) */
+.prose { font-size: var(--fs-lg); line-height: 1.65; }
+.prose > * + * { margin-top: 1.1em; }
+.prose h2 { font-family: var(--f-display); text-transform: uppercase; font-size: var(--fs-2xl); line-height: 1; margin-top: 2em; }
+.prose h3 { font-weight: 700; font-size: var(--fs-xl); margin-top: 1.6em; }
+.prose ul { padding-left: 1.2em; }
+.prose li + li { margin-top: 0.4em; }
+.prose a { text-decoration: underline; text-underline-offset: 3px; }
+.prose blockquote { font-family: var(--f-serif); font-style: italic; font-size: var(--fs-xl); border-left: 3px solid var(--c-orange); padding-left: 1em; }
+
+/* Champ « À compléter » dans les pages juridiques */
+.todo-field { color: var(--fg); background: color-mix(in srgb, var(--c-orange) 28%, transparent); padding: 0.05em 0.35em; border-radius: 4px; font-weight: 600; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+
+/* ---------- Formulaires (communs contact / rendez-vous) ---------- */
+.field { display: grid; gap: 0.4rem; }
+.field label, .field .field__label { font-weight: 700; font-size: var(--fs-sm); }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 0.9rem 0; border: 0; border-bottom: 1.5px solid var(--line-strong); background: transparent;
+  border-radius: 0; color: var(--fg); transition: border-color var(--dur);
+}
+.field select { appearance: none; padding-right: 1.5rem; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23888' stroke-width='1.6'/%3E%3C/svg%3E") right 0.25rem center no-repeat; }
+.field select option { background: var(--surface); color: var(--fg); }
+.field textarea { resize: vertical; min-height: 130px; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent-display); box-shadow: 0 1.5px 0 var(--accent-display); }
+.field.is-invalid input, .field.is-invalid textarea, .field.is-invalid select { border-color: var(--danger); }
+.field__error { color: var(--danger); font-size: var(--fs-xs); font-weight: 600; }
+.field__hint { color: var(--fg-muted); font-size: var(--fs-xs); }
+.field input::placeholder, .field textarea::placeholder { color: var(--fg-muted); opacity: 0.75; }
+.req { color: var(--accent-text); }
+.consent { display: flex; gap: 0.75rem; align-items: flex-start; font-size: var(--fs-sm); color: var(--fg-muted); }
+.consent input { width: 18px; height: 18px; margin-top: 0.15rem; accent-color: var(--c-orange-deep); flex: none; }
+.consent.is-invalid { color: var(--danger); }
+.hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+.form-notice { font-size: var(--fs-xs); color: var(--fg-muted); line-height: 1.5; }
+.form-notice a { text-decoration: underline; text-underline-offset: 2px; }
+.status { font-weight: 600; min-height: 1.5em; }
+.status[data-state="ok"] { color: var(--success); }
+.status[data-state="error"] { color: var(--danger); }

@@ -1,0 +1,36 @@
+---
+import { site } from "../../data/site";
+import { url } from "../../i18n";
+---
+
+<p>Cette page décrit les cookies et autres traceurs (stockage local du navigateur) utilisés sur ce site, conformément à l’article 82 de la loi Informatique et Libertés et aux lignes directrices et recommandations de la CNIL du 17 septembre 2020.</p>
+
+<h2>1. Notre approche</h2>
+<p>Le site a été conçu pour fonctionner <strong>sans traceur publicitaire ni de suivi</strong>. Les polices de caractères sont hébergées sur nos serveurs : aucune requête n’est envoyée à des services tiers lors de votre navigation. Aucun traceur non essentiel n’est déposé avant que vous ayez donné votre accord.</p>
+
+<h2>2. Traceurs strictement nécessaires (exemptés de consentement)</h2>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Nom</th><th>Finalité</th><th>Durée</th></tr></thead>
+    <tbody>
+      <tr><td><code>nu-consent</code></td><td>Mémoriser vos choix en matière de cookies</td><td>6 mois</td></tr>
+      <tr><td><code>nu-theme</code></td><td>Mémoriser le thème clair ou sombre que vous avez choisi</td><td>Jusqu’à suppression par vos soins</td></tr>
+      <tr><td><code>nu-lang</code></td><td>Mémoriser la langue que vous avez choisie</td><td>Jusqu’à suppression par vos soins</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>Ces informations sont enregistrées dans le stockage local de votre navigateur, ne contiennent aucune donnée d’identification et ne sont jamais transmises à {site.name}.</p>
+
+<h2>3. Traceurs soumis à votre consentement</h2>
+<ul>
+  <li><strong>Mesure d’audience :</strong> aucun outil n’est actif à ce jour. Si un outil est ajouté, il sera décrit ici (éditeur, finalité, durée de vie des cookies, 13 mois maximum) et ne sera activé qu’avec votre accord.</li>
+  <li><strong>Contenus tiers :</strong> aucun contenu tiers (vidéo, carte) n’est intégré à ce jour. Le cas échéant, il ne sera affiché qu’avec votre accord.</li>
+</ul>
+
+<h2>4. Gérer vos choix</h2>
+<p>Lors de votre première visite, un bandeau vous permet d’accepter, de refuser ou de personnaliser les traceurs. Refuser est aussi simple qu’accepter, et votre choix est conservé 6 mois, puis vous est à nouveau demandé. Vous pouvez le modifier à tout moment :</p>
+<p><button type="button" class="btn" data-cookie-open>Gérer mes préférences cookies</button></p>
+<p>Vous pouvez également supprimer les données enregistrées depuis les réglages de votre navigateur (rubrique « Confidentialité » ou « Données de site »).</p>
+
+<h2>5. En savoir plus</h2>
+<p>Pour en savoir plus sur le traitement de vos données, consultez notre <a href={url("privacy", "fr")}>politique de confidentialité</a> ou le site de la CNIL : <a href="https://www.cnil.fr/fr/cookies-et-autres-traceurs" target="_blank" rel="noopener">cnil.fr/fr/cookies-et-autres-traceurs</a>.</p>

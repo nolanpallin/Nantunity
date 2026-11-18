@@ -1,0 +1,44 @@
+---
+/** FAQ en accordéon accessible (<details>), avec données structurées FAQPage pour le référencement. */
+interface Props { items: { q: string; a: string }[] }
+const { items } = Astro.props;
+const ld = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: items.map((i) => ({ "@type": "Question", name: i.q, acceptedAnswer: { "@type": "Answer", text: i.a } })),
+};
+---
+
+<div class="faq">
+  {
+    items.map((it, i) => (
+      <details class="faq__item" data-reveal style={`--d:${i % 3}`} name="faq">
+        <summary class="faq__q">
+          <span class="faq__num label">{String(i + 1).padStart(2, "0")}</span>
+          <span class="faq__text">{it.q}</span>
+          <span class="faq__icon" aria-hidden="true" />
+        </summary>
+        <div class="faq__a"><p>{it.a}</p></div>
+      </details>
+    ))
+  }
+</div>
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />
+
+<style>
+  .faq { border-top: 1px solid var(--line); }
+  .faq__item { border-bottom: 1px solid var(--line); }
+  .faq__q { list-style: none; cursor: pointer; display: grid; grid-template-columns: auto 1fr auto; gap: 1.25rem; align-items: center; padding: 1.4rem 0; font-weight: 700; font-size: var(--fs-lg); transition: color var(--dur-fast); }
+  .faq__q::-webkit-details-marker { display: none; }
+  .faq__q:hover { color: var(--accent-text); }
+  .faq__num { color: var(--fg-muted); }
+  .faq__icon { position: relative; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid currentColor; transition: transform var(--dur) var(--ease-out), background var(--dur); }
+  .faq__icon::before, .faq__icon::after { content: ""; position: absolute; left: 50%; top: 50%; width: 12px; height: 1.5px; background: currentColor; transform: translate(-50%, -50%); }
+  .faq__icon::after { transform: translate(-50%, -50%) rotate(90deg); transition: transform var(--dur) var(--ease-out); }
+  .faq__item[open] .faq__icon { background: var(--c-orange); border-color: var(--c-orange); color: var(--c-black); }
+  .faq__item[open] .faq__icon::after { transform: translate(-50%, -50%) rotate(0deg); }
+  .faq__a { padding: 0 3.5rem 1.6rem calc(1.25rem + 1.6rem); color: var(--fg-muted); max-width: 70ch; }
+  .faq__item[open] .faq__a { animation: faq-in 500ms var(--ease-out); }
+  @keyframes faq-in { from { opacity: 0; transform: translateY(-6px); } }
+  @media (max-width: 560px) { .faq__a { padding: 0 0 1.4rem; } .faq__q { gap: 0.75rem; } }
+</style>

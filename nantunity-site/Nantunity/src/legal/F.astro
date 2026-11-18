@@ -1,0 +1,8 @@
+---
+/** Affiche une information juridique ; si elle reste à compléter (« [À compléter… »), elle est surlignée. */
+interface Props { v: string }
+const { v } = Astro.props;
+const todo = v.trim().startsWith("[");
+---
+
+{todo ? <mark class="todo-field">{v}</mark> : <>{v}</>}

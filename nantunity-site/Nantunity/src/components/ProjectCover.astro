@@ -1,0 +1,96 @@
+---
+/**
+ * Visuel de couverture d'un projet.
+ * - Si une image `cover` est fournie dans la fiche projet, elle est affichée (optimisée par Astro).
+ * - Sinon, une composition graphique est générée aux couleurs du pôle, à partir des formes
+ *   du logo (colonnes condensées, coupe oblique du N et du Y, U arrondi, apostrophe).
+ */
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { getPole } from "../data/poles";
+import type { Lang } from "../i18n";
+
+interface Props {
+  pole: string;
+  lang: Lang;
+  pattern?: number;
+  cover?: ImageMetadata;
+  /** Texte alternatif ; chaîne vide = image décorative (ex. carte dont le titre suit) */
+  alt?: string;
+  class?: string;
+  eager?: boolean;
+}
+const { pole, lang, pattern = 0, cover, alt = "", class: className = "", eager = false } = Astro.props;
+const p = getPole(pole, lang)!;
+const { bg, accent } = p.colors;
+const ink = "#0b0b0b";
+---
+
+<div class:list={["cover", className]}>
+  {
+    cover ? (
+      <Image src={cover} alt={alt} widths={[480, 800, 1200]} sizes="(max-width: 760px) 100vw, 50vw" loading={eager ? "eager" : "lazy"} />
+    ) : (
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" {...(alt ? { role: "img", "aria-label": alt } : { "aria-hidden": "true" })}>
+        <rect width="400" height="300" fill={bg} />
+        {pattern === 0 && (
+          <g fill={accent}>
+            <path d="M40 300V120h34v180Z" />
+            <path d="M90 300V70h34l10 230Z" opacity=".9" />
+            <path d="M150 300V150h34v150Z" />
+            <path d="M200 300V40h34v260Z" />
+            <path d="M250 300V105l34-25v220Z" />
+            <path d="M300 300V180h34v120Z" opacity=".55" />
+            <circle cx="345" cy="70" r="18" fill="none" stroke={accent} stroke-width="3" />
+          </g>
+        )}
+        {pattern === 1 && (
+          <g>
+            <circle cx="290" cy="150" r="150" fill={accent} />
+            <circle cx="290" cy="150" r="96" fill={bg} />
+            <g stroke={accent} stroke-width="1.5" opacity=".5">
+              {[40, 80, 120, 160, 200, 240].map((y) => <line x1="0" y1={y} x2="160" y2={y} />)}
+            </g>
+            <rect x="30" y="215" width="120" height="44" fill={accent} />
+          </g>
+        )}
+        {pattern === 2 && (
+          <g>
+            <path d="M0 230L400 70V130L0 290Z" fill={accent} />
+            <text x="40" y="330" font-family="Fraunces Variable, Georgia, serif" font-size="380" fill={accent} opacity=".95">’</text>
+            <rect x="300" y="200" width="60" height="60" fill="none" stroke={accent} stroke-width="3" />
+          </g>
+        )}
+        {pattern === 3 && (
+          <g fill="none" stroke={accent} stroke-width="22">
+            <path d="M80 -10V170a120 120 0 0 0 240 0V-10" />
+            <path d="M140 -10V170a60 60 0 0 0 120 0V-10" opacity=".6" />
+            <path d="M190 -10V170a10 10 0 0 0 20 0V-10" opacity=".35" stroke-width="10" />
+          </g>
+        )}
+        {pattern === 4 && (
+          <g>
+            {Array.from({ length: 6 }).map((_, c) =>
+              Array.from({ length: 4 }).map((_, r) => (
+                <rect x={30 + c * 58} y={30 + r * 62} width="46" height="46" rx={(c + r) % 3 === 0 ? 23 : 0} fill={(c * 3 + r) % 4 === 0 ? accent : "none"} stroke={accent} stroke-width="2.5" />
+              )),
+            )}
+          </g>
+        )}
+        {pattern === 5 && (
+          <g>
+            <path d="M60 300L150 0H220L130 300Z" fill={accent} />
+            <path d="M190 300L280 0H310L220 300Z" fill={accent} opacity=".6" />
+            <rect x="250" y="190" width="120" height="70" fill={ink} opacity=".25" />
+            <rect x="262" y="202" width="120" height="70" fill="none" stroke={accent} stroke-width="3" />
+          </g>
+        )}
+      </svg>
+    )
+  }
+</div>
+
+<style>
+  .cover { position: relative; overflow: hidden; aspect-ratio: 4 / 3; background: var(--c-grey-100); }
+  .cover :global(svg), .cover :global(img) { width: 100%; height: 100%; object-fit: cover; }
+</style>

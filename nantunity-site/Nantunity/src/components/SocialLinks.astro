@@ -1,0 +1,40 @@
+---
+/**
+ * Liens vers les réseaux sociaux actifs (renseignés dans src/data/site.ts), avec icône.
+ * S'ouvrent dans un nouvel onglet ; le libellé accessible précise l'ouverture d'une nouvelle fenêtre.
+ */
+import SocialIcon from "./SocialIcon.astro";
+import { activeSocials } from "../data/site";
+import type { Lang } from "../i18n";
+interface Props { lang: Lang; variant?: "icon" | "full"; class?: string }
+const { lang, variant = "full", class: className = "" } = Astro.props;
+const newTab = lang === "fr" ? "(nouvel onglet)" : "(opens in a new tab)";
+---
+
+<ul class:list={["socials", `socials--${variant}`, className]} role="list">
+  {
+    activeSocials.map((s) => (
+      <li>
+        <a href={s.url} target="_blank" rel="noopener noreferrer" class="socials__link" aria-label={`${s.name} ${s.handle ?? ""} ${newTab}`.replace(/\s+/g, " ")}>
+          <span class="socials__icon"><SocialIcon name={s.name} /></span>
+          {variant === "full" && <span class="socials__text">{s.handle || s.name}</span>}
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .socials { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .socials__link { display: inline-flex; align-items: center; gap: 0.65rem; font-weight: 500; color: inherit; }
+  .socials__icon {
+    display: grid; place-items: center; width: 44px; height: 44px; flex: none;
+    border-radius: 50%; border: 1.5px solid var(--line-strong); color: currentColor;
+    transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out), border-color var(--dur), transform var(--dur) var(--ease-out);
+  }
+  /* Survol : pastille orange, icône noire (lisible dans les deux thèmes) */
+  .socials__link:hover .socials__icon, .socials__link:focus-visible .socials__icon {
+    background: var(--c-orange); border-color: var(--c-orange); color: var(--c-black);
+  }
+  .socials__link:hover .socials__text { text-decoration: underline; text-underline-offset: 3px; }
+</style>

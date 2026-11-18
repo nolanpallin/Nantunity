@@ -1,0 +1,42 @@
+---
+/** Conteneur du sélecteur de créneau (rempli par src/scripts/booking.ts) + ses styles. */
+interface Props { id?: string }
+const { id = "picker" } = Astro.props;
+---
+
+<div class="pk-root" id={id} data-picker></div>
+
+<style is:global>
+  .pk { display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(1rem, 3vw, 2.5rem); }
+  .pk__cal, .pk__slots { background: var(--surface); border-radius: var(--radius-l); padding: clamp(1rem, 2.5vw, 1.75rem); }
+  .pk__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .pk__month { font-family: var(--f-display); text-transform: uppercase; font-size: var(--fs-xl); line-height: 1; }
+  .pk__nav { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--line-strong); font-size: 1.4rem; line-height: 1; transition: background var(--dur-fast), color var(--dur-fast); }
+  .pk__nav:hover:not(:disabled) { background: var(--fg); color: var(--bg-paper); }
+  .pk__nav:disabled { opacity: 0.3; cursor: not-allowed; }
+  .pk__row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
+  .pk__wd { text-align: center; font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); padding: 0.4rem 0; }
+  .pk__row > span { display: block; }
+  .pk__day {
+    width: 100%; aspect-ratio: 1; border-radius: 12px; font-weight: 600; font-variant-numeric: tabular-nums;
+    color: var(--fg-muted); opacity: 0.45; cursor: default; transition: background var(--dur-fast), color var(--dur-fast), transform var(--dur-fast);
+  }
+  .pk__day.is-avail { opacity: 1; color: var(--fg); cursor: pointer; background: color-mix(in srgb, var(--c-orange) 18%, transparent); }
+  .pk__day.is-avail:hover { background: color-mix(in srgb, var(--c-orange) 45%, transparent); }
+  .pk__day.is-sel { background: var(--c-orange) !important; color: var(--c-black); }
+  .pk__day--empty { aspect-ratio: 1; }
+  .pk__slots-title { font-weight: 700; margin-bottom: 1rem; }
+  .pk__slots-title::first-letter { text-transform: uppercase; }
+  .pk__slot-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; max-height: 340px; overflow-y: auto; padding: 2px; }
+  .pk__slot {
+    display: grid; gap: 2px; padding: 0.75rem 0.5rem; border-radius: 12px; border: 1.5px solid var(--line-strong);
+    font-weight: 700; font-variant-numeric: tabular-nums; transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
+  }
+  .pk__slot small { font-weight: 500; font-size: 0.6875rem; color: var(--fg-muted); }
+  .pk__slot:hover { border-color: var(--fg); }
+  .pk__slot.is-sel { background: var(--fg); color: var(--bg-paper); border-color: var(--fg); }
+  .pk__slot.is-sel small { color: inherit; opacity: 0.75; }
+  .pk__msg { color: var(--fg-muted); font-size: var(--fs-sm); padding: 1rem 0; grid-column: 1 / -1; }
+  .pk__msg--err { color: var(--danger); }
+  @media (max-width: 760px) { .pk { grid-template-columns: 1fr; } }
+</style>

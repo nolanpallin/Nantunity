@@ -1,0 +1,269 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Heritage from "../components/Heritage.astro";
+import Arrow from "../components/Arrow.astro";
+import SocialLinks from "../components/SocialLinks.astro";
+import { site } from "../data/site";
+import { getPoles, poleVars } from "../data/poles";
+import { useT, url, rich, type Lang } from "../i18n";
+
+interface Props { lang: Lang; alternates: Record<Lang, string> }
+const { lang, alternates } = Astro.props;
+const t = useT(lang);
+const c = t.contact;
+const poles = getPoles(lang);
+const msgs = { errRequired: c.errRequired, errEmail: c.errEmail, sending: c.sending, ok: c.ok, mailtoOk: c.mailtoOk, fail: c.fail, subject: c.subject };
+---
+
+<BaseLayout lang={lang} alternates={alternates} title={c.title} description={c.description}>
+  <section class="page-hero theme-ink chero has-motif">
+    <div class="container chero__grid">
+      <div>
+        <p class="page-hero__label label" data-reveal>{c.title}</p>
+        <h1 class="page-hero__title display lines">
+          {c.h1.map((l) => <span class="line"><span set:html={rich(l)} /></span>)}
+        </h1>
+        <p class="page-hero__intro muted" data-reveal style="--d:2">{c.intro}</p>
+      </div>
+      <aside class="coords" data-reveal style="--d:3" aria-label={c.coords}>
+        <div>
+          <p class="label text-orange">{c.write}</p>
+          <a href={`mailto:${site.contact.email}`} class="coords__big link-u">{site.contact.email}</a>
+        </div>
+        {
+          site.contact.phone && (
+            <div>
+              <p class="label text-orange">{c.call}</p>
+              <a href={`tel:${site.contact.phone.replace(/\s/g, "")}`} class="coords__big link-u">{site.contact.phone}</a>
+            </div>
+          )
+        }
+        <div>
+          <p class="label text-orange">{c.find}</p>
+          <p>{site.contact.address}</p>
+        </div>
+        <div>
+          <p class="label text-orange">{c.follow}</p>
+          <SocialLinks lang={lang} />
+        </div>
+        <a href={url("booking", lang)} class="coords__book">
+          <span>{c.bookTitle}</span>
+          <span class="btn">{c.bookCta} <Arrow /></span>
+        </a>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section theme-paper">
+    <div class="container form-wrap">
+      <div class="form-side">
+        <h2 class="display form-side__title" data-reveal set:html={rich(c.formTitle)} />
+        <ol class="form-side__steps" role="list" data-reveal style="--d:1">
+          {c.steps.map((s, i) => <li><span class="label">0{i + 1}</span> {s}</li>)}
+        </ol>
+      </div>
+
+      <form class="form" data-contact-form data-endpoint={site.formEndpoint || "/api/contact"} data-email={site.contact.email} data-msgs={JSON.stringify(msgs)} novalidate>
+        <input type="hidden" name="lang" value={lang} />
+        <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+        <fieldset class="form__group">
+          <legend class="label">{c.poles}</legend>
+          <div class="poles-pick">
+            {
+              poles.map((p) => (
+                <label class="pick" style={poleVars(p)}>
+                  <input type="checkbox" name="poles" value={p.name} data-slug={p.id} />
+                  <span class="pick__box">
+                    <span class="pick__num display">{p.index}</span>
+                    <span class="pick__name">{p.name}</span>
+                  </span>
+                </label>
+              ))
+            }
+            <label class="pick pick--any">
+              <input type="checkbox" name="poles" value={c.dontKnow} />
+              <span class="pick__box">
+                <span class="pick__num display">?</span>
+                <span class="pick__name">{c.dontKnow}</span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="form__row">
+          <div class="field">
+            <label for="f-name">{c.name} <span class="req" aria-hidden="true">*</span></label>
+            <input id="f-name" name="name" type="text" autocomplete="name" required maxlength="120" aria-describedby="f-name-err" />
+            <span class="field__error" id="f-name-err" aria-live="polite"></span>
+          </div>
+          <div class="field">
+            <label for="f-org">{c.org}</label>
+            <input id="f-org" name="organisation" type="text" autocomplete="organization" placeholder={c.orgPh} maxlength="160" />
+          </div>
+        </div>
+        <div class="form__row">
+          <div class="field">
+            <label for="f-email">{c.email} <span class="req" aria-hidden="true">*</span></label>
+            <input id="f-email" name="email" type="email" autocomplete="email" required maxlength="160" aria-describedby="f-email-err" />
+            <span class="field__error" id="f-email-err" aria-live="polite"></span>
+          </div>
+          <div class="field">
+            <label for="f-tel">{c.phone}</label>
+            <input id="f-tel" name="phone" type="tel" autocomplete="tel" maxlength="40" />
+          </div>
+        </div>
+        <div class="form__row">
+          <div class="field">
+            <label for="f-type">{c.profile}</label>
+            <select id="f-type" name="profile">
+              <option value="">{c.select}</option>
+              {c.profiles.map((o) => <option>{o}</option>)}
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-delay">{c.deadline}</label>
+            <select id="f-delay" name="deadline">
+              <option value="">{c.select}</option>
+              {c.deadlines.map((o) => <option>{o}</option>)}
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-msg">{c.message} <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="f-msg" name="message" rows="6" required maxlength="5000" placeholder={c.messagePh} aria-describedby="f-msg-err"></textarea>
+          <span class="field__error" id="f-msg-err" aria-live="polite"></span>
+        </div>
+        <label class="consent">
+          <input type="checkbox" name="consent" required />
+          <span>{c.consent} <span class="req" aria-hidden="true">*</span></span>
+        </label>
+        <p class="form-notice">{t.privacyNotice} <a href={url("privacy", lang)}>{t.privacyLink}</a>.</p>
+
+        <div class="form__foot">
+          <p class="form__req">{t.common.required}</p>
+          <button type="submit" class="btn" data-magnetic>{c.submit} <Arrow /></button>
+        </div>
+        <p class="status" role="status" aria-live="polite" data-status></p>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
+  if (form) {
+    const msgs = JSON.parse(form.dataset.msgs || "{}");
+    const status = form.querySelector<HTMLElement>("[data-status]")!;
+    const btn = form.querySelector<HTMLButtonElement>("button[type=submit]")!;
+
+    // Présélection du pôle via ?pole=… (boutons « Demander un devis » des pages pôle)
+    const pre = new URLSearchParams(location.search).get("pole");
+    if (pre) {
+      const box = form.querySelector<HTMLInputElement>(`input[data-slug="${CSS.escape(pre)}"]`);
+      if (box) box.checked = true;
+    }
+
+    const setStatus = (text: string, state = "") => { status.textContent = text; status.dataset.state = state; };
+
+    const mailto = (data: FormData, poles: string) => {
+      const lines = [
+        `${data.get("name")} — ${data.get("email")}`,
+        `${data.get("organisation") || ""} ${data.get("phone") || ""}`.trim(),
+        `${data.get("profile") || ""} · ${poles} · ${data.get("deadline") || ""}`,
+        "",
+        String(data.get("message")),
+      ];
+      location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(`${msgs.subject} — ${data.get("name")}`)}&body=${encodeURIComponent(lines.join("\n"))}`;
+      setStatus(msgs.mailtoOk, "ok");
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      form.querySelectorAll(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
+      form.querySelectorAll(".field__error").forEach((el) => (el.textContent = ""));
+
+      if (!form.checkValidity()) {
+        const invalid = [...form.querySelectorAll<HTMLInputElement>(":invalid")];
+        invalid.forEach((el) => {
+          const wrap = el.closest(".field, .consent");
+          wrap?.classList.add("is-invalid");
+          el.setAttribute("aria-invalid", "true");
+          const err = wrap?.querySelector(".field__error");
+          if (err) err.textContent = el.type === "email" && el.value ? msgs.errEmail : msgs.errRequired;
+        });
+        invalid[0]?.focus();
+        setStatus(msgs.errRequired, "error");
+        return;
+      }
+      form.querySelectorAll("[aria-invalid]").forEach((el) => el.removeAttribute("aria-invalid"));
+
+      const data = new FormData(form);
+      const poles = data.getAll("poles").join(", ") || "—";
+      btn.disabled = true;
+      setStatus(msgs.sending);
+      try {
+        const body = Object.fromEntries(data.entries()) as Record<string, unknown>;
+        body.poles = poles;
+        body.consent = data.get("consent") === "on";
+        const res = await fetch(form.dataset.endpoint!, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (res.status === 503) return mailto(data, poles); // envoi d'e-mails non configuré
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        setStatus(msgs.ok, "ok");
+      } catch {
+        setStatus(`${msgs.fail} ${form.dataset.email}.`, "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+</script>
+
+<style>
+  .chero__grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--space-7); align-items: end; }
+  .coords { display: grid; gap: 1.5rem; padding: clamp(1.5rem, 3vw, 2.5rem); border: 1px solid var(--line); border-radius: var(--radius-l); }
+  .coords .label { margin-bottom: 0.4rem; }
+  .coords__big { font-size: var(--fs-lg); font-weight: 700; word-break: break-word; }
+  .coords__socials { display: flex; flex-wrap: wrap; gap: 1.25rem; font-weight: 600; }
+  .coords__book { display: grid; gap: 0.75rem; justify-items: start; padding-top: 1.5rem; border-top: 1px solid var(--line); font-weight: 700; }
+  .coords__book .btn { padding: 0.8rem 1.2rem; font-size: 0.75rem; }
+  @media (max-width: 860px) { .chero__grid { grid-template-columns: 1fr; } }
+
+  .form-wrap { display: grid; grid-template-columns: 1fr 2fr; gap: clamp(2rem, 6vw, 6rem); align-items: start; }
+  .form-side { position: sticky; top: calc(var(--header-h) + 1.5rem); }
+  .form-side__title { font-size: var(--fs-3xl); }
+  .form-side__title :global(.serif-i) { color: var(--accent-display); }
+  .form-side__steps { margin-top: var(--space-6); }
+  .form-side__steps li { display: flex; gap: 1rem; align-items: baseline; padding: 1rem 0; border-top: 1px solid var(--line); font-weight: 600; }
+  .form-side__steps .label { color: var(--accent-text); }
+  @media (max-width: 960px) { .form-wrap { grid-template-columns: 1fr; } .form-side { position: static; } }
+
+  .form { position: relative; display: grid; gap: 1.5rem; background: var(--surface); padding: clamp(1.25rem, 4vw, 3rem); border-radius: var(--radius-l); }
+  .form__group { border: 0; padding: 0; }
+  .form__group legend { margin-bottom: 1rem; }
+  .poles-pick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } /* 5 pôles + « je ne sais pas » = 3 × 2 */
+  .pick { position: relative; cursor: pointer; }
+  .pick input { position: absolute; opacity: 0; inset: 0; cursor: pointer; margin: 0; }
+  .pick__box {
+    display: flex; flex-direction: column; justify-content: space-between; gap: 1.5rem; height: 100%;
+    padding: 1rem; border-radius: var(--radius-m);
+    border: 1.5px solid var(--line);
+    transition: background var(--dur), color var(--dur), border-color var(--dur), transform var(--dur-fast);
+  }
+  .pick__num { font-size: var(--fs-xl); color: var(--pole-text, var(--fg)); transition: color var(--dur); }
+  .pick__name { font-weight: 700; font-size: var(--fs-sm); line-height: 1.2; }
+  .pick:hover .pick__box { border-color: var(--pole-bg, var(--fg)); }
+  .pick input:checked + .pick__box { background: var(--pole-bg, var(--fg)); color: var(--pole-ink, var(--bg-paper)); border-color: var(--pole-bg, var(--fg)); }
+  .pick input:checked + .pick__box .pick__num { color: var(--pole-title, var(--c-orange)); }
+  .pick input:focus-visible + .pick__box { box-shadow: var(--focus); }
+  @media (max-width: 760px) { .poles-pick { grid-template-columns: 1fr 1fr; } }
+
+  .form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 600px) { .form__row { grid-template-columns: 1fr; } }
+  .form__foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; }
+  .form__req { font-size: var(--fs-xs); color: var(--fg-muted); }
+</style>

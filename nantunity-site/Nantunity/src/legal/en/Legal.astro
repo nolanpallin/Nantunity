@@ -1,0 +1,43 @@
+---
+import F from "../F.astro";
+import { site } from "../../data/site";
+import { url } from "../../i18n";
+const L = site.legal;
+---
+
+<p>In accordance with Article 6-III of French Law No. 2004-575 of 21 June 2004 on confidence in the digital economy (LCEN), the following information is provided to users of <strong>{site.url.replace("https://", "")}</strong>.</p>
+
+<h2>1. Publisher</h2>
+<ul>
+  <li><strong>Name:</strong> <F v={L.legalName} /></li>
+  <li><strong>Legal form:</strong> non-profit association governed by the French Law of 1 July 1901</li>
+  <li><strong>Registration:</strong> <F v={L.declaration} /></li>
+  <li><strong>RNA number:</strong> <F v={L.rna} /></li>
+  <li><strong>SIRET:</strong> <F v={L.siret} /></li>
+  <li><strong>VAT:</strong> <F v={L.vat} /></li>
+  <li><strong>Registered office:</strong> <F v={L.headOffice} /></li>
+  <li><strong>Email:</strong> <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></li>
+</ul>
+<p><mark class="todo-field">[To be checked: “Junior-Entreprise” is a trademark protected by the French National Confederation of Junior-Entreprises (CNJE). State the association’s status within the movement here, or adapt the wording used on the site.]</mark></p>
+
+<h2>2. Publication director</h2>
+<p><F v={L.publisher} /> — contact: <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.</p>
+
+<h2>3. Hosting</h2>
+<ul>
+  <li><strong>Host:</strong> <F v={L.host.name} /></li>
+  <li><strong>Address:</strong> <F v={L.host.address} /></li>
+  <li><strong>Phone:</strong> <F v={L.host.phone} /></li>
+</ul>
+
+<h2>4. Intellectual property</h2>
+<p>All elements of this site (logo, text, visuals, layout, code) belong to {L.legalName} or are used with permission. Any reproduction, representation, modification or adaptation, in whole or in part, without prior written consent is prohibited (Articles L.122-4 et seq. of the French Intellectual Property Code). The typefaces used (Anton, Fraunces, Roboto) are distributed under the SIL Open Font License and self-hosted.</p>
+
+<h2>5. Liability</h2>
+<p>{L.legalName} strives to provide accurate, up-to-date information but cannot guarantee it is free from errors or omissions. The site may contain links to third-party sites for which {L.legalName} accepts no responsibility.</p>
+
+<h2>6. Personal data and cookies</h2>
+<p>See our <a href={url("privacy", "en")}>privacy policy</a> and <a href={url("cookies", "en")}>cookie policy</a>.</p>
+
+<h2>7. Governing law</h2>
+<p>This legal notice is governed by French law. For any question, email <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.</p>

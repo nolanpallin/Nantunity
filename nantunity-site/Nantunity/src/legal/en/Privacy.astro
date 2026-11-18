@@ -1,0 +1,68 @@
+---
+import F from "../F.astro";
+import { site } from "../../data/site";
+import { url } from "../../i18n";
+const L = site.legal;
+---
+
+<p>This policy explains how {L.legalName} collects and uses your personal data when you use this site, in compliance with the EU General Data Protection Regulation 2016/679 (“GDPR”) and the amended French Data Protection Act of 6 January 1978.</p>
+
+<h2>1. Data controller</h2>
+<p>{L.legalName}, a French non-profit association, registered office: <F v={L.headOffice} />.<br />Data protection contact: <a href={`mailto:${L.privacyContact}`}>{L.privacyContact}</a>.</p>
+<p>The association is not required to appoint a Data Protection Officer. <mark class="todo-field">[To be completed: name or role of the board member in charge of data protection.]</mark></p>
+
+<h2>2. Data collected, purposes and legal bases</h2>
+<h3>a) Project enquiry form</h3>
+<ul>
+  <li><strong>Data:</strong> full name, email, phone (optional), organisation (optional), profile, team(s) involved, timeline, message.</li>
+  <li><strong>Purposes:</strong> responding to your enquiry, discussing your project and sending a proposal or quote.</li>
+  <li><strong>Legal basis:</strong> steps taken at your request prior to entering into a contract (Art. 6(1)(b) GDPR).</li>
+  <li><strong>Retention:</strong> 3 years from your last contact, then deletion <mark class="todo-field">[proposed period, to be validated]</mark>.</li>
+</ul>
+<h3>b) Online meeting booking</h3>
+<ul>
+  <li><strong>Data:</strong> first and last name, email, organisation (optional), phone (optional; required for phone meetings), purpose, preferred format, additional details, chosen date and time.</li>
+  <li><strong>Purposes:</strong> organising the meeting, adding it to the team calendar, sending a confirmation and allowing you to reschedule or cancel.</li>
+  <li><strong>Legal basis:</strong> pre-contractual steps at your request (Art. 6(1)(b) GDPR).</li>
+  <li><strong>Retention:</strong> the calendar entry is kept for up to 3 years after the meeting, then deleted <mark class="todo-field">[proposed period, to be validated]</mark>.</li>
+</ul>
+<h3>c) Client management</h3>
+<ul>
+  <li><strong>Data:</strong> contact details, correspondence, quotes, invoices.</li>
+  <li><strong>Legal basis:</strong> performance of a contract (Art. 6(1)(b)) and legal obligations (Art. 6(1)(c)).</li>
+  <li><strong>Retention:</strong> duration of the relationship plus 3 years; accounting records are kept for 10 years (Article L.123-22 of the French Commercial Code).</li>
+</ul>
+<h3>d) Audience measurement (only with your consent)</h3>
+<p>No audience measurement tool is currently active. Should one be added, it will only load after your consent, which you may withdraw at any time. See our <a href={url("cookies", "en")}>cookie policy</a>.</p>
+<h3>e) Display preferences</h3>
+<p>Your language, theme (light/dark) and cookie choices are stored <strong>only on your device</strong> (browser local storage) and are never sent to us.</p>
+<h3>f) Technical data</h3>
+<p>Our hosting provider may keep technical logs (IP address, date, page requested) for security purposes, for the period required by the regulations applicable to it. <mark class="todo-field">[To be completed depending on the host.]</mark></p>
+
+<h2>3. Recipients</h2>
+<p>Your data is only accessible to authorised members of the {L.legalName} team. It is never sold or shared for marketing purposes. It may be processed on our behalf by the following service providers (processors under Art. 28 GDPR):</p>
+<ul>
+  <li><strong>Website hosting:</strong> <F v={L.host.name} /></li>
+  <li><strong>Meeting calendar:</strong> Google Calendar (Google Ireland Limited, Ireland)</li>
+  <li><strong>Automated emails:</strong> Resend (Resend, Inc., USA)</li>
+</ul>
+<p>Some of these providers may transfer data outside the EU, under appropriate safeguards (EU-U.S. Data Privacy Framework adequacy decision or European Commission standard contractual clauses). <mark class="todo-field">[To be checked with each provider before going live.]</mark></p>
+
+<h2>4. Security</h2>
+<p>The site is served over HTTPS. Booking management links are signed and unique to each booking; API keys are stored server-side and never exposed in the browser. Access to data is restricted to authorised members.</p>
+
+<h2>5. Your rights</h2>
+<ul>
+  <li>right of access (Art. 15 GDPR) and rectification (Art. 16);</li>
+  <li>right to erasure (Art. 17) and restriction of processing (Art. 18);</li>
+  <li>right to data portability (Art. 20);</li>
+  <li>right to object (Art. 21);</li>
+  <li>right to withdraw consent at any time where processing is based on consent;</li>
+  <li>right to set instructions regarding your data after your death (Art. 85 of the French Data Protection Act).</li>
+</ul>
+
+<h2>6. Exercising your rights</h2>
+<p>Email <a href={`mailto:${L.privacyContact}`}>{L.privacyContact}</a> or write to the association’s registered office. We will respond within one month, extendable by two months for complex requests (Art. 12 GDPR). If you believe your rights have not been respected, you may lodge a complaint with the French data protection authority, CNIL: 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07 — <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>.</p>
+
+<h2>7. Changes</h2>
+<p>This policy may be updated. The date of the latest update is shown at the top of the page.</p>

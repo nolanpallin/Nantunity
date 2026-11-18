@@ -1,0 +1,106 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Heritage from "../components/Heritage.astro";
+import Arrow from "../components/Arrow.astro";
+import Logo from "../components/Logo.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { getPoles, poleVars } from "../data/poles";
+import { useT, url, rich, type Lang } from "../i18n";
+
+interface Props { lang: Lang; alternates: Record<Lang, string> }
+const { lang, alternates } = Astro.props;
+const t = useT(lang);
+const pp = t.polesPage;
+const poles = getPoles(lang);
+---
+
+<BaseLayout lang={lang} alternates={alternates} title={pp.title} description={pp.description}>
+  <section class="page-hero theme-ink has-motif">
+    <div class="container">
+      <p class="page-hero__label label" data-reveal>{pp.label}</p>
+      <h1 class="page-hero__title display lines">
+        {pp.h1.map((l) => <span class="line"><span set:html={rich(l)} /></span>)}
+      </h1>
+      <p class="page-hero__intro muted" data-reveal style="--d:3">{pp.intro}</p>
+      <nav class="jump" aria-label={pp.jump} data-reveal style="--d:4">
+        {poles.map((p) => <a href={`#${p.urlSlug}`} class="chip" style={poleVars(p)}><span class="dot" />{p.name}</a>)}
+      </nav>
+    </div>
+  </section>
+
+  {
+    poles.map((p, i) => (
+      <section id={p.urlSlug} class:list={["pole-block theme-pole", i % 2 && "pole-block--rev"]} style={poleVars(p)}>
+        <div class="container pole-block__grid">
+          <div class="pole-block__visual" data-reveal="scale">
+            <span class="pole-block__index display" aria-hidden="true">{p.index}</span>
+            <Logo variant={p.logo} class="pole-block__logo" label={`Nant'Unity — ${p.logoTagline}`} />
+          </div>
+          <div class="pole-block__text">
+            <p class="label" data-reveal>{t.common.pole} {p.index}</p>
+            <h2 class="pole-block__title display" data-reveal>{p.name}</h2>
+            <p class="pole-block__tag serif-i" data-reveal>{p.tagline}</p>
+            <p class="pole-block__intro" data-reveal>{p.intro}</p>
+            <ul class="pole-block__services" role="list" data-reveal>
+              {p.services.map((s) => <li>{s.title}</li>)}
+            </ul>
+            <a href={url("poles", lang, p.urlSlug)} class="btn btn--pole" data-reveal data-magnetic>
+              {t.common.discoverPole} <Arrow />
+            </a>
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section theme-paper other">
+    <div class="container other__inner" data-reveal>
+      <span class="other__q display" aria-hidden="true">?</span>
+      <div>
+        <h2 class="display other__title">{pp.otherTitle}</h2>
+        <p class="other__text muted">{pp.otherText}</p>
+      </div>
+      <a href={url("contact", lang)} class="btn btn--dark" data-magnetic>{pp.otherCta} <Arrow /></a>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} title={pp.ctaTitle} accent={pp.ctaAccent} text={pp.ctaText} />
+</BaseLayout>
+
+<style>
+  .jump { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: var(--space-7); }
+  .jump .chip { border-color: var(--line-strong); transition: background var(--dur), color var(--dur), border-color var(--dur); }
+  .jump .chip:hover { background: var(--pole-bg); color: var(--pole-ink); border-color: var(--pole-bg); }
+
+  .pole-block { padding-block: var(--section-y); overflow: hidden; }
+  .pole-block__grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 7rem); align-items: center; }
+  .pole-block--rev .pole-block__visual { order: 2; }
+  .pole-block__visual {
+    position: relative; aspect-ratio: 1; display: grid; place-items: center;
+    border-radius: var(--radius-l);
+    background: color-mix(in srgb, var(--pole-bg) 82%, black);
+    color: var(--pole-accent);
+  }
+  .pole-block__index { position: absolute; top: 1rem; left: 1.5rem; font-size: clamp(5rem, 12vw, 11rem); line-height: 1; opacity: 0.14; }
+  .pole-block__logo { width: 62%; transition: transform 800ms var(--ease-out); }
+  .pole-block__visual:hover .pole-block__logo { transform: scale(1.05) rotate(-2deg); }
+  .pole-block__text { display: grid; gap: var(--space-4); justify-items: start; }
+  .pole-block__text > .label { color: var(--pole-title); }
+  .pole-block__title { font-size: var(--fs-3xl); color: var(--pole-title); }
+  .pole-block__tag { font-size: var(--fs-xl); }
+  .pole-block__intro { max-width: 48ch; }
+  .pole-block__services { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 1.5rem; width: 100%; margin-block: var(--space-4); }
+  .pole-block__services li { padding: 0.6rem 0; border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent); font-weight: 600; font-size: var(--fs-sm); }
+  @media (max-width: 860px) {
+    .pole-block__grid { grid-template-columns: 1fr; }
+    .pole-block--rev .pole-block__visual { order: 0; }
+    .pole-block__visual { aspect-ratio: 4 / 3; }
+  }
+  @media (max-width: 480px) { .pole-block__services { grid-template-columns: 1fr; } }
+
+  .other__inner { display: grid; grid-template-columns: auto 1fr auto; gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; padding: clamp(1.5rem, 4vw, 3rem); border: 1.5px dashed var(--line-strong); border-radius: var(--radius-l); }
+  .other__q { font-size: clamp(5rem, 10vw, 9rem); line-height: 0.8; color: var(--accent-display); }
+  .other__title { font-size: var(--fs-2xl); }
+  .other__text { margin-top: 0.5rem; max-width: 56ch; }
+  @media (max-width: 760px) { .other__inner { grid-template-columns: 1fr; } }
+</style>

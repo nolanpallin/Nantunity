@@ -1,0 +1,88 @@
+---
+/** Les quatre pôles en colonnes extensibles (s'ouvrent au survol / focus). Empilées sur mobile. */
+import Arrow from "./Arrow.astro";
+import { getPoles, poleVars } from "../data/poles";
+import { useT, url, type Lang } from "../i18n";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const poles = getPoles(lang);
+---
+
+<ul class="acc" role="list">
+  {
+    poles.map((p, i) => (
+      <li class:list={["acc__item", i === 0 && "is-active"]} style={`${poleVars(p)}--d:${i}`} data-reveal>
+        <a href={url("poles", lang, p.urlSlug)} class="acc__link">
+          <span class="acc__num display">{p.index}</span>
+          <span class="acc__vtitle display" aria-hidden="true">{p.short}</span>
+          <span class="acc__content">
+            <span class="acc__title display">{p.name}</span>
+            <span class="acc__tag serif-i">{p.tagline}</span>
+            <span class="acc__keys">
+              {p.keywords.map((k) => <span class="chip">{k}</span>)}
+            </span>
+            <span class="acc__more label">{t.common.discoverPole} <Arrow /></span>
+          </span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".acc").forEach((acc) => {
+    const items = [...acc.querySelectorAll<HTMLElement>(".acc__item")];
+    const activate = (el: HTMLElement) => items.forEach((it) => it.classList.toggle("is-active", it === el));
+    items.forEach((it) => {
+      it.addEventListener("pointerenter", () => activate(it));
+      it.addEventListener("focusin", () => activate(it));
+    });
+  });
+</script>
+
+<style>
+  .acc { display: flex; gap: 10px; height: clamp(520px, 72vh, 720px); }
+  .acc__item {
+    flex: 1; min-width: 0;
+    background: var(--pole-bg); color: var(--pole-ink);
+    border-radius: var(--radius-l);
+    overflow: hidden;
+    transition: flex 800ms var(--ease-out), opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+  }
+  .acc__item.is-active { flex: 3.6; }
+  .acc__link { position: relative; display: block; height: 100%; padding: clamp(1.25rem, 2.2vw, 2.25rem); }
+  /* --pole-title : couleur des titres sur le fond du pôle (contraste garanti, cf. data/poles.ts) */
+  .acc__num { font-size: var(--fs-2xl); color: var(--pole-title); }
+  .acc__vtitle {
+    position: absolute; left: 50%; bottom: 2rem;
+    writing-mode: vertical-rl; transform: translateX(-50%) rotate(180deg);
+    font-size: clamp(2.5rem, 4vw, 4.5rem); color: var(--pole-title);
+    white-space: nowrap;
+    transition: opacity var(--dur) var(--ease-out);
+  }
+  .acc__item.is-active .acc__vtitle { opacity: 0; }
+  .acc__content {
+    position: absolute; left: clamp(1.25rem, 2.2vw, 2.25rem); right: clamp(1.25rem, 2.2vw, 2.25rem); bottom: clamp(1.25rem, 2.2vw, 2.25rem);
+    display: flex; flex-direction: column; gap: 1rem;
+    min-width: 340px;
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 300ms var(--ease-out), transform 500ms var(--ease-out);
+    pointer-events: none;
+  }
+  .acc__item.is-active .acc__content { opacity: 1; transform: none; transition-delay: 250ms; pointer-events: auto; }
+  .acc__title { font-size: clamp(2.5rem, 1.5rem + 3vw, 5rem); color: var(--pole-title); line-height: 0.92; }
+  .acc__tag { font-size: var(--fs-xl); }
+  .acc__keys { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .acc__keys .chip { font-size: 0.8125rem; border-color: color-mix(in srgb, currentColor 40%, transparent); }
+  .acc__more { display: inline-flex; align-items: center; gap: 0.6rem; margin-top: 0.5rem; color: var(--pole-title); }
+  .acc__link:hover .acc__more :global(svg) { transform: translateX(6px); }
+  .acc__more :global(svg) { transition: transform var(--dur) var(--ease-out); }
+
+  @media (max-width: 900px) {
+    .acc { flex-direction: column; height: auto; }
+    .acc__item, .acc__item.is-active { flex: none; }
+    .acc__vtitle { display: none; }
+    .acc__content { position: static; opacity: 1; transform: none; min-width: 0; margin-top: 1.5rem; pointer-events: auto; }
+  }
+</style>

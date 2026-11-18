@@ -1,0 +1,31 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Arrow from "../components/Arrow.astro";
+import { useT, url } from "../i18n";
+
+// La page 404 est bilingue : français par défaut, lien vers l'accueil anglais.
+const t = useT("fr");
+const en = useT("en");
+---
+
+<BaseLayout lang="fr" title={t.notFound.title} noindex>
+  <section class="nf theme-ink">
+    <div class="container">
+      <p class="label text-orange">Erreur 404 · Error 404</p>
+      <h1 class="nf__title display">Oups<span class="serif-i text-orange">’</span></h1>
+      <p class="lead muted">{t.notFound.text}</p>
+      <p class="muted" lang="en">{en.notFound.text}</p>
+      <div class="nf__actions">
+        <a href={url("home", "fr")} class="btn" data-magnetic>{t.notFound.back} <Arrow /></a>
+        <a href={url("home", "en")} class="btn btn--ghost" lang="en">{en.notFound.back}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf { min-height: 100svh; display: grid; align-items: center; padding-top: var(--header-h); }
+  .nf .container { display: grid; gap: 1.25rem; justify-items: start; }
+  .nf__title { font-size: var(--fs-mega); line-height: 0.85; }
+  .nf__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+</style>

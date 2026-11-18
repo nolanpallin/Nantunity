@@ -1,0 +1,113 @@
+---
+import Logo from "./Logo.astro";
+import Arrow from "./Arrow.astro";
+import SocialLinks from "./SocialLinks.astro";
+import { site } from "../data/site";
+import { getPoles, poleVars } from "../data/poles";
+import { useT, url, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const poles = getPoles(lang);
+const year = new Date().getFullYear();
+const nav = [
+  { label: t.nav.home, href: url("home", lang) },
+  { label: t.nav.poles, href: url("poles", lang) },
+  { label: t.nav.projects, href: url("projects", lang) },
+  { label: t.nav.about, href: url("about", lang) },
+  { label: t.nav.booking, href: url("booking", lang) },
+  { label: t.nav.contact, href: url("contact", lang) },
+];
+const legal = [
+  { label: t.footer.legalNotice, href: url("legal", lang) },
+  { label: t.footer.privacy, href: url("privacy", lang) },
+  { label: t.footer.cookies, href: url("cookies", lang) },
+  { label: t.footer.terms, href: url("terms", lang) },
+  { label: t.footer.sales, href: url("sales", lang) },
+];
+---
+
+<footer class="ftr theme-ink has-motif">
+  <div class="ftr__bars" aria-hidden="true">
+    {poles.map((p) => <span style={poleVars(p)} />)}
+  </div>
+  <div class="container">
+    <div class="ftr__top">
+      <p class="ftr__pitch display">
+        {t.footer.pitch1}<br />
+        <span class="serif-i text-orange">{t.footer.pitch2}</span>
+      </p>
+      <div class="ftr__ctas">
+        <a href={url("booking", lang)} class="btn btn--ghost">{t.common.book}</a>
+        <a href={url("contact", lang)} class="btn" data-magnetic>{t.footer.write} <Arrow /></a>
+      </div>
+    </div>
+
+    <div class="ftr__grid">
+      <div>
+        <p class="label ftr__h">{t.footer.navigation}</p>
+        <ul role="list">{nav.map((n) => <li><a href={n.href} class="link-u">{n.label}</a></li>)}</ul>
+      </div>
+      <div>
+        <p class="label ftr__h">{t.footer.poles}</p>
+        <ul role="list">
+          {
+            poles.map((p) => (
+              <li style={poleVars(p)}>
+                <a href={url("poles", lang, p.urlSlug)} class="link-u ftr__pole"><span class="dot" />{p.name}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div>
+        <p class="label ftr__h">{t.footer.contact}</p>
+        <ul role="list">
+          <li><a href={`mailto:${site.contact.email}`} class="link-u ftr__mail">{site.contact.email}</a></li>
+          {site.contact.phone && <li><a href={`tel:${site.contact.phone.replace(/\s/g, "")}`} class="link-u">{site.contact.phone}</a></li>}
+          <li class="muted">{site.contact.address}</li>
+        </ul>
+        <p class="label ftr__h ftr__h--2">{t.footer.socials}</p>
+        <SocialLinks lang={lang} />
+      </div>
+      <div>
+        <p class="label ftr__h">{t.footer.legal}</p>
+        <ul role="list">
+          {legal.map((n) => <li><a href={n.href} class="link-u">{n.label}</a></li>)}
+          <li><button type="button" class="link-u ftr__cookie" data-cookie-open>{t.footer.cookieSettings}</button></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ftr__logo" aria-hidden="true" data-reveal="fade">
+      <Logo variant="full" decorative />
+    </div>
+
+    <div class="ftr__legal">
+      <p>© {year} Nant'Unity — {t.footer.copyright}</p>
+      <a href="#contenu" class="link-u">{t.common.backTop}</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ftr { position: relative; padding: clamp(4rem, 8vw, 7rem) 0 2rem; overflow: hidden; }
+  .ftr__bars { position: absolute; inset: 0 0 auto; height: 8px; display: flex; }
+  .ftr__bars span { flex: 1; background: var(--pole-bg); }
+  .ftr__top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 2rem; padding-bottom: clamp(3rem, 6vw, 5rem); border-bottom: 1px solid var(--line); }
+  .ftr__pitch { font-size: var(--fs-3xl); }
+  .ftr__pitch .serif-i { font-size: 0.85em; }
+  .ftr__ctas { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .ftr__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; padding-block: clamp(3rem, 6vw, 4.5rem); }
+  .ftr__grid ul { display: grid; gap: 0.6rem; justify-items: start; }
+  .ftr__h { color: var(--accent-text); margin-bottom: 1.25rem; }
+  .ftr__h--2 { margin-top: 2rem; }
+  .ftr__pole { display: inline-flex; align-items: center; gap: 0.6rem; }
+  .ftr__cookie { text-align: left; }
+  .ftr__mail { word-break: break-all; font-weight: 500; }
+  .ftr__logo { color: var(--logo); width: min(100%, 760px); margin-inline: auto; padding-block: 1rem 3rem; }
+  .ftr__legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--line); font-size: var(--fs-sm); color: var(--fg-muted); }
+  @media (max-width: 860px) { .ftr__grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .ftr__grid { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,377 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Arrow from "../components/Arrow.astro";
+import Marquee from "../components/Marquee.astro";
+import PolesAccordion from "../components/PolesAccordion.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import CtaBand from "../components/CtaBand.astro";
+import Faq from "../components/Faq.astro";
+import ProjectsEmpty from "../components/ProjectsEmpty.astro";
+import Heritage from "../components/Heritage.astro";
+import { getPoles, getPole, poleVars } from "../data/poles";
+import { testimonials, clients } from "../data/about";
+import { getProjects } from "../lib/projects";
+import { useT, url, rich, type Lang } from "../i18n";
+
+interface Props { lang: Lang; alternates: Record<Lang, string> }
+const { lang, alternates } = Astro.props;
+const t = useT(lang);
+const h = t.home;
+const poles = getPoles(lang);
+const featured = (await getProjects(lang)).filter((p) => p.data.featured).slice(0, 3);
+---
+
+<BaseLayout lang={lang} alternates={alternates} headerTone="auto">
+  <!-- ============ HERO ============ -->
+  <section class="hero theme-ink has-motif">
+    <!-- Le Grand Éléphant des Machines de l'île, en filigrane derrière « L'union fait la com' » -->
+    <Heritage motif="elephant" class="hm--hero-title" size="clamp(280px, 40vw, 600px)" />
+    <Heritage motif="loire" class="hm--bottom" />
+    <div class="container hero__grid">
+      <div class="hero__text">
+        <p class="hero__kicker label" data-reveal>{h.kicker}</p>
+        <h1 class="hero__title display lines">
+          <span class="line"><span>{h.title[0]}</span></span>
+          <span class="line"><span>{h.title[1]}</span></span>
+          <span class="line"><span class="serif-i hero__accent">{h.title[2]}</span></span>
+        </h1>
+        <p class="hero__lead lead" data-reveal style="--d:4">{h.lead}</p>
+        <div class="hero__actions" data-reveal style="--d:5">
+          <a href={url("contact", lang)} class="btn" data-magnetic>{t.common.quote} <Arrow /></a>
+          <a href={url("booking", lang)} class="btn btn--ghost">{t.common.book}</a>
+        </div>
+      </div>
+
+      <!-- Une colonne par pôle, comme les lettres condensées de « UNITY » -->
+      <nav class="hero__cols" aria-label={h.colsLabel}>
+        {
+          poles.map((p, i) => (
+            <a href={url("poles", lang, p.urlSlug)} class="hero__col" style={`${poleVars(p)}--i:${i}`}>
+              <span class="hero__col-label label">{p.short}</span>
+              <span class="hero__col-num display">{p.index}</span>
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+    <div class="container hero__foot">
+      <span class="label muted">{t.meta.baseline}</span>
+      <span class="hero__scroll label" aria-hidden="true">{h.scroll} <i></i></span>
+      <span class="label muted">47.218° N — 1.553° O</span>
+    </div>
+  </section>
+
+  <Marquee class="theme-orange" items={t.marquee} />
+
+  <!-- ============ CONCEPT + CHIFFRES ============ -->
+  <section class="section theme-paper concept has-motif">
+    <Heritage motif="chateau" class="hm--tr" size="clamp(240px, 32vw, 520px)" />
+    <div class="container concept__grid">
+      <p class="label concept__label" data-reveal>{h.conceptLabel}</p>
+      <h2 class="concept__title" data-reveal>
+        {h.conceptTitle} <span class="serif-i">{h.conceptAccent}</span>
+      </h2>
+      <div class="concept__body" data-reveal style="--d:1">
+        <p class="lead">{h.conceptLead}</p>
+        <p class="muted">{h.conceptText}</p>
+        <a href={url("about", lang)} class="concept__link label link-u">{h.conceptLink} <Arrow /></a>
+      </div>
+      <ul class="concept__facts" role="list">
+        {
+          h.facts.map((f, i) => (
+            <li data-reveal style={`--d:${i + 1}`}>
+              <span class="display" data-count={f.value} data-suffix={f.suffix}>{f.value}{f.suffix}</span>
+              <span>{f.text}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PÔLES ============ -->
+  <section class="section theme-ink">
+    <div class="container">
+      <div class="sec-head">
+        <p class="label text-orange" data-reveal>{h.polesLabel}</p>
+        <h2 class="sec-head__title display lines">
+          {h.polesTitle.map((l) => <span class="line"><span set:html={rich(l, "serif-i text-orange")} /></span>)}
+        </h2>
+        <p class="sec-head__text muted" data-reveal>{h.polesText}</p>
+      </div>
+      <PolesAccordion lang={lang} />
+    </div>
+  </section>
+
+  <!-- ============ APPROCHE + ATOUTS ============ -->
+  <section class="section theme-white approach has-motif">
+    <Heritage motif="grue" class="hm--tr" size="clamp(240px, 30vw, 480px)" />
+    <div class="container">
+      <div class="sec-head sec-head--split">
+        <p class="label" data-reveal>{h.approachLabel}</p>
+        <h2 class="sec-head__title display lines">
+          {h.approachTitle.map((l) => <span class="line"><span set:html={rich(l)} /></span>)}
+        </h2>
+      </div>
+      <ol class="steps" role="list">
+        {
+          t.approach.map((s, i) => (
+            <li class="step" data-reveal style={`--d:${i}`}>
+              <span class="step__num display">{s.step}</span>
+              <h3 class="step__title">{s.title}</h3>
+              <p class="step__text">{s.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="assets">
+        <div class="assets__head">
+          <p class="label" data-reveal>{h.assetsLabel}</p>
+          <h2 class="assets__title display" data-reveal>{h.assetsTitle}</h2>
+        </div>
+        <ul class="assets__grid" role="list">
+          {
+            t.assets.map((a, i) => (
+              <li class="asset" data-reveal style={`--d:${i}`} data-spotlight>
+                <span class="asset__num label">0{i + 1}</span>
+                <h3 class="asset__title">{a.title}</h3>
+                <p>{a.text}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROJETS ============ -->
+  <section class="section theme-paper work">
+    <div class="container">
+      {
+        featured.length > 0 ? (
+          <>
+            <div class="work__head">
+              <div>
+                <p class="label" data-reveal>{h.workLabel}</p>
+                <h2 class="sec-head__title display lines">
+                  {h.workTitle.map((l) => <span class="line"><span set:html={rich(l)} /></span>)}
+                </h2>
+              </div>
+              <a href={url("projects", lang)} class="btn btn--ghost" data-reveal>{t.common.seeAll} <Arrow /></a>
+            </div>
+            <div class="work__grid">
+              {featured.map((p, i) => <div class={`work__cell work__cell--${i}`} data-reveal style={`--d:${i}`}><ProjectCard project={p} size={i === 0 ? "large" : "default"} /></div>)}
+            </div>
+          </>
+        ) : (
+          <>
+            <p class="label work__label" data-reveal>{h.workLabel}</p>
+            <ProjectsEmpty lang={lang} compact />
+          </>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- ============ TÉMOIGNAGES & CLIENTS (affichés uniquement s'ils sont renseignés) ============ -->
+  {
+    (testimonials.length > 0 || clients.length > 0) && (
+      <section class="section theme-white trust">
+        <div class="container">
+          {testimonials.length > 0 && (
+            <>
+              <p class="label" data-reveal>{h.testimonialsLabel}</p>
+              <ul class="quotes" role="list">
+                {testimonials.map((q, i) => {
+                  const p = q.pole ? getPole(q.pole, lang) : undefined;
+                  return (
+                    <li class="quote" style={`${p ? poleVars(p) : ""}--d:${i % 3}`} data-reveal>
+                      <blockquote>
+                        <p class="serif-i">« {q.quote[lang]} »</p>
+                      </blockquote>
+                      <p class="quote__by"><strong>{q.author}</strong> — {q.org}</p>
+                    </li>
+                  );
+                })}
+              </ul>
+            </>
+          )}
+          {clients.length > 0 && (
+            <div class="clients">
+              <p class="label">{h.trustLabel}</p>
+              <ul class="clients__list" role="list">
+                {clients.map((c) => (
+                  <li>
+                    {c.url ? <a href={c.url} target="_blank" rel="noopener"><img src={c.logo} alt={c.name} loading="lazy" /></a> : <img src={c.logo} alt={c.name} loading="lazy" />}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  <!-- ============ FAQ + RENDEZ-VOUS ============ -->
+  <section class="section theme-white faq-sec has-motif">
+    <Heritage motif="cathedrale" class="hm--br" size="clamp(200px, 22vw, 340px)" />
+    <div class="container faq-sec__grid">
+      <div class="faq-sec__side">
+        <p class="label" data-reveal>{h.faqLabel}</p>
+        <h2 class="display faq-sec__title" data-reveal>{h.faqTitle} <span class="serif-i">{h.faqAccent}</span></h2>
+        <div class="book-card theme-orange" data-reveal>
+          <p class="book-card__title">{h.bookTitle}</p>
+          <p class="book-card__text">{h.bookText}</p>
+          <a href={url("booking", lang)} class="btn btn--dark" data-magnetic>{t.common.book} <Arrow /></a>
+        </div>
+      </div>
+      <Faq items={t.faq} />
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+</BaseLayout>
+
+<style>
+  /* ---------- Hero ---------- */
+  .hero { min-height: 100svh; display: flex; flex-direction: column; padding-top: calc(var(--header-h) + 2rem); overflow: hidden; }
+  .hero__grid { flex: 1; display: grid; grid-template-columns: 1.25fr 1fr; gap: var(--space-7); align-items: center; padding-block: 2rem; }
+  .hero__kicker { color: var(--accent-text); margin-bottom: var(--space-5); }
+  .hero__title { font-size: clamp(4.2rem, 1.5rem + 10vw, 12.5rem); line-height: 0.84; }
+  .hero__accent { color: var(--accent-display); font-size: 0.92em; line-height: 1; letter-spacing: -0.03em; }
+  .hero__lead { margin-top: var(--space-6); color: var(--fg-muted); max-width: 44ch; }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: var(--space-6); }
+
+  /* Quatre colonnes de pôles : le nom est ancré en bas, juste au-dessus du numéro,
+     loin de la coupe oblique du sommet → plus d'air pour « Graphisme » et « Événementiel ». */
+  .hero__cols { display: flex; align-items: flex-end; gap: clamp(10px, 1.2vw, 16px); height: min(66vh, 600px); padding-left: clamp(0rem, 2vw, 2rem); }
+  .hero__col {
+    position: relative; flex: 1; min-width: 0;
+    background: var(--pole-bg); color: var(--pole-title);
+    height: calc(52% + var(--i) * 12%); /* 5 colonnes : 52 % → 100 % */
+    display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 1.1rem;
+    padding: 1.1rem clamp(0.7rem, 1vw, 1rem) 1.6rem;
+    /* Base arrondie pour les quatre pôles, comme le « U » du logo */
+    border-radius: 0 0 999px 999px;
+    clip-path: polygon(0 calc(5% + var(--i) * 1.5%), 100% 0, 100% 100%, 0 100%);
+    transform-origin: bottom;
+    animation: col-rise 1.2s var(--ease-out) both;
+    animation-delay: calc(var(--i) * 110ms + 300ms);
+    transition: height 700ms var(--ease-out), filter var(--dur);
+  }
+  .hero__col:hover, .hero__col:focus-visible { height: 100%; }
+  .hero__cols:hover .hero__col:not(:hover) { filter: saturate(0.6) brightness(0.8); }
+  .hero__col-label {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    color: var(--pole-ink); font-size: 0.75rem; letter-spacing: 0.24em; white-space: nowrap;
+  }
+  .hero__col-num { font-size: clamp(1.6rem, 1rem + 1.6vw, 2.6rem); line-height: 1; }
+  @keyframes col-rise { from { transform: scaleY(0); } }
+
+  .hero__foot { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-block: 1.5rem 2rem; border-top: 1px solid var(--line); }
+  .hero__scroll { display: inline-flex; align-items: center; gap: 0.75rem; }
+  .hero__scroll i { width: 1px; height: 28px; background: var(--c-orange); transform-origin: top; animation: scrollcue 1.8s var(--ease-in-out) infinite; }
+  @keyframes scrollcue { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+  @media (max-width: 900px) {
+    .hero__grid { grid-template-columns: 1fr; }
+    .hero__cols { height: 300px; padding-left: 0; }
+    .hero__cols { gap: 7px; }
+    .hero__col { height: calc(60% + var(--i) * 10%); gap: 0.7rem; padding-inline: 0.3rem; padding-bottom: 1.1rem; }
+    .hero__col-label { font-size: 0.625rem; letter-spacing: 0.14em; }
+    .hero__col-num { font-size: 1.35rem; }
+    .hero__foot > :last-child { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .hero__col, .hero__scroll i { animation: none; } }
+
+  /* ---------- En-têtes de section ---------- */
+  .sec-head { display: grid; gap: var(--space-5); margin-bottom: clamp(2.5rem, 5vw, 4.5rem); max-width: 980px; }
+  .sec-head__title { font-size: var(--fs-3xl); }
+  .sec-head__title :global(.serif-i) { font-size: 0.9em; }
+  .sec-head__text { max-width: 52ch; font-size: var(--fs-lg); }
+
+  /* ---------- Concept ---------- */
+  .concept__grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--space-6) var(--gutter); }
+  .concept__label { grid-column: 1 / -1; }
+  .concept__title { grid-column: 1 / 8; font-family: var(--f-display); text-transform: uppercase; font-size: var(--fs-3xl); line-height: 0.95; }
+  .concept__title .serif-i { display: block; color: var(--accent-display); text-transform: none; }
+  .concept__body { grid-column: 8 / -1; display: grid; gap: var(--space-5); align-content: start; padding-top: 0.6rem; }
+  .concept__body .lead { font-weight: 600; }
+  .concept__link { display: inline-flex; align-items: center; gap: 0.6rem; justify-self: start; }
+  .concept__facts { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); margin-top: var(--space-8); border-top: 1.5px solid var(--fg); }
+  .concept__facts li { display: flex; flex-direction: column; gap: 0.5rem; padding: 1.5rem 1.5rem 0 0; }
+  .concept__facts li + li { padding-left: 1.5rem; border-left: 1px solid var(--line); }
+  .concept__facts .display { font-size: var(--fs-4xl); line-height: 0.9; font-variant-numeric: tabular-nums; }
+  .concept__facts li:nth-child(2) .display { color: var(--accent-display); }
+  @media (max-width: 860px) {
+    .concept__title, .concept__body { grid-column: 1 / -1; }
+    .concept__facts { grid-template-columns: 1fr; }
+    .concept__facts li + li { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); padding-bottom: 1.5rem; }
+  }
+
+  /* ---------- Approche ---------- */
+  .sec-head--split { max-width: none; grid-template-columns: 1fr 2fr; align-items: start; }
+  @media (max-width: 860px) { .sec-head--split { grid-template-columns: 1fr; } }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .step { position: relative; padding: 2rem 1.5rem 2rem 0; border-top: 1.5px solid var(--fg); }
+  .step::before { content: ""; position: absolute; left: 0; top: -1.5px; height: 1.5px; width: 0; background: var(--c-orange); transition: width 900ms var(--ease-out); }
+  .step:hover::before { width: 100%; }
+  .step__num { font-size: var(--fs-2xl); color: var(--accent-display); }
+  .step__title { font-weight: 800; font-size: var(--fs-xl); margin: 0.75rem 0 0.5rem; font-stretch: 110%; }
+  .step__text { color: var(--fg-muted); max-width: 30ch; }
+  @media (max-width: 900px) { .steps { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .steps { grid-template-columns: 1fr; } }
+
+  .assets { margin-top: var(--space-10); display: grid; grid-template-columns: 1fr 2fr; gap: var(--gutter); align-items: start; }
+  .assets__head { position: sticky; top: calc(var(--header-h) + 1rem); display: grid; gap: var(--space-4); }
+  .assets__title { font-size: var(--fs-3xl); }
+  .assets__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .asset {
+    position: relative; overflow: hidden; isolation: isolate;
+    padding: clamp(1.25rem, 2.5vw, 2rem); border-radius: var(--radius-m); background: var(--surface-2);
+    display: grid; gap: 0.75rem; align-content: start; min-height: 220px;
+    transition: transform var(--dur) var(--ease-out);
+  }
+  .asset::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0; transition: opacity var(--dur); background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--c-orange) 38%, transparent), transparent 70%); }
+  .asset:hover::before { opacity: 1; }
+  .asset:hover { transform: translateY(-4px); }
+  .asset__num { color: var(--accent-text); }
+  .asset__title { font-family: var(--f-display); text-transform: uppercase; font-size: var(--fs-xl); line-height: 1; margin-top: 1.5rem; }
+  .asset p { color: var(--fg-muted); }
+  @media (max-width: 960px) { .assets { grid-template-columns: 1fr; } .assets__head { position: static; } }
+  @media (max-width: 560px) { .assets__grid { grid-template-columns: 1fr; } .asset { min-height: 0; } }
+
+  /* ---------- Projets ---------- */
+  .work__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 2rem; margin-bottom: var(--space-5); }
+  .work__head .label { margin-bottom: var(--space-5); }
+  .work__note { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; font-size: var(--fs-sm); color: var(--fg-muted); margin-bottom: var(--space-7); }
+  .work__grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--space-7) var(--gutter); }
+  .work__cell--0 { grid-column: 1 / 8; grid-row: span 2; }
+  .work__cell--1, .work__cell--2 { grid-column: 8 / -1; }
+  @media (max-width: 860px) { .work__cell--0, .work__cell--1, .work__cell--2 { grid-column: 1 / -1; grid-row: auto; } }
+
+  /* ---------- Confiance ---------- */
+  .quotes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--gutter); margin-top: var(--space-6); }
+  .quote { padding: 2rem; border-radius: var(--radius-l); background: var(--surface-2); border-top: 6px solid var(--pole-bg, var(--c-orange)); }
+  .quote p.serif-i { font-size: var(--fs-xl); line-height: 1.3; }
+  .quote__by { margin-top: 1.25rem; font-size: var(--fs-sm); color: var(--fg-muted); }
+  .clients { margin-top: var(--space-8); }
+  .clients__list { display: flex; flex-wrap: wrap; gap: 2rem 3rem; align-items: center; margin-top: var(--space-5); }
+  .clients__list img { height: 44px; width: auto; filter: grayscale(1); opacity: 0.75; transition: filter var(--dur), opacity var(--dur); }
+  .clients__list img:hover { filter: none; opacity: 1; }
+  :global([data-theme="dark"]) .clients__list img { filter: grayscale(1) invert(1); }
+
+  /* ---------- FAQ ---------- */
+  .faq-sec { padding-top: 0; }
+  .faq-sec__grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: clamp(2rem, 6vw, 6rem); align-items: start; padding-top: var(--section-y); border-top: 1px solid var(--line); }
+  .faq-sec__side { display: grid; gap: var(--space-5); position: sticky; top: calc(var(--header-h) + 1rem); }
+  .faq-sec__title { font-size: var(--fs-3xl); }
+  .faq-sec__title .serif-i { display: block; color: var(--accent-display); }
+  .book-card { margin-top: var(--space-5); padding: 1.75rem; border-radius: var(--radius-l); display: grid; gap: 0.75rem; justify-items: start; }
+  .book-card__title { font-family: var(--f-display); text-transform: uppercase; font-size: var(--fs-xl); line-height: 1; }
+  .book-card__text { color: var(--fg-muted); margin-bottom: 0.5rem; }
+  .work__label { margin-bottom: var(--space-5); }
+  @media (max-width: 960px) { .faq-sec__grid { grid-template-columns: 1fr; } .faq-sec__side { position: static; } }
+</style>

@@ -1,0 +1,35 @@
+---
+import { site } from "../../data/site";
+import { url } from "../../i18n";
+const L = site.legal;
+---
+
+<h2>1. Objet</h2>
+<p>Les présentes conditions générales d’utilisation (CGU) définissent les modalités d’accès et d’utilisation du site <strong>{site.url.replace("https://", "")}</strong>, édité par {L.legalName}. En naviguant sur le site, vous acceptez les présentes CGU.</p>
+
+<h2>2. Accès au site</h2>
+<p>Le site est accessible gratuitement à tout utilisateur disposant d’un accès à internet. {L.legalName} s’efforce d’assurer son accessibilité en continu, sans obligation de résultat. L’accès peut être interrompu pour maintenance ou en cas de force majeure, sans que la responsabilité de l’association puisse être engagée.</p>
+
+<h2>3. Services proposés</h2>
+<p>Le site permet de découvrir l’association et ses prestations, de transmettre une demande de projet et de réserver un rendez-vous avec l’équipe. Une demande ou une réservation n’engage ni l’utilisateur ni l’association à conclure une prestation : celle-ci fait l’objet d’un devis accepté, soumis le cas échéant aux <a href={url("sales", "fr")}>conditions générales de vente</a>.</p>
+
+<h2>4. Engagements de l’utilisateur</h2>
+<p>L’utilisateur s’engage à fournir des informations exactes, à ne pas utiliser les formulaires à des fins illicites, abusives ou publicitaires, et à ne pas porter atteinte au bon fonctionnement du site (tentatives d’intrusion, envois automatisés…). Toute réservation effectuée au nom d’un tiers sans son accord est interdite.</p>
+
+<h2>5. Rendez-vous en ligne</h2>
+<p>Les rendez-vous sont proposés selon les disponibilités de l’équipe, en heure de Paris. Une confirmation est envoyée par e-mail avec un lien personnel permettant de modifier ou d’annuler le rendez-vous. Ce lien ne doit pas être partagé. En cas d’empêchement, merci d’annuler le rendez-vous afin de libérer le créneau. L’association se réserve le droit d’annuler un rendez-vous, en vous en informant par e-mail.</p>
+
+<h2>6. Propriété intellectuelle</h2>
+<p>Les contenus du site sont protégés par le droit de la propriété intellectuelle. Voir les <a href={url("legal", "fr")}>mentions légales</a>.</p>
+
+<h2>7. Responsabilité</h2>
+<p>Les informations du site sont fournies à titre indicatif. {L.legalName} ne saurait être tenue responsable des dommages indirects liés à l’utilisation du site, ni du contenu des sites tiers vers lesquels des liens peuvent renvoyer.</p>
+
+<h2>8. Données personnelles</h2>
+<p>Les données collectées via le site sont traitées conformément à la <a href={url("privacy", "fr")}>politique de confidentialité</a>.</p>
+
+<h2>9. Modification des CGU</h2>
+<p>{L.legalName} peut modifier les présentes CGU à tout moment. La version applicable est celle en ligne lors de votre visite.</p>
+
+<h2>10. Droit applicable</h2>
+<p>Les présentes CGU sont soumises au droit français. En cas de litige, une solution amiable sera recherchée avant toute action ; à défaut, les tribunaux français seront compétents dans les conditions de droit commun.</p>

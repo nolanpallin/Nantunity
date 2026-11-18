@@ -1,0 +1,76 @@
+---
+/**
+ * Route unique multilingue : génère toutes les pages en /fr/… et /en/….
+ * Chaque page est rendue par une « vue » (src/views) partagée entre les langues :
+ * aucun composant n'est dupliqué, seules les traductions changent.
+ */
+import { locales, routes, url, type Lang, type RouteKey } from "../../i18n";
+import { getPoles } from "../../data/poles";
+import { getProjects, type Project } from "../../lib/projects";
+
+import Home from "../../views/Home.astro";
+import PolesIndex from "../../views/PolesIndex.astro";
+import PoleDetail from "../../views/PoleDetail.astro";
+import ProjectsIndex from "../../views/ProjectsIndex.astro";
+import ProjectDetail from "../../views/ProjectDetail.astro";
+import About from "../../views/About.astro";
+import Contact from "../../views/Contact.astro";
+import Booking from "../../views/Booking.astro";
+import BookingManage from "../../views/BookingManage.astro";
+import Legal from "../../views/Legal.astro";
+
+type Entry = {
+  params: { lang: Lang; path: string | undefined };
+  props: { view: string; lang: Lang; alternates: Record<Lang, string>; data?: any };
+};
+
+export async function getStaticPaths() {
+  const entries: Entry[] = [];
+  const pathOf = (u: string, lang: Lang) => u.replace(`/${lang}/`, "").replace(/\/$/, "") || undefined;
+  const add = (view: string, alts: Record<Lang, string>, data: (l: Lang) => any = () => undefined) => {
+    for (const lang of locales) entries.push({ params: { lang, path: pathOf(alts[lang], lang) }, props: { view, lang, alternates: alts, data: data(lang) } });
+  };
+  const both = (key: RouteKey, ...rest: string[]) => ({ fr: url(key, "fr", ...rest), en: url(key, "en", ...rest) }) as Record<Lang, string>;
+
+  const simple: [string, RouteKey][] = [
+    ["home", "home"], ["poles", "poles"], ["projects", "projects"], ["about", "about"], ["contact", "contact"],
+    ["booking", "booking"], ["bookingManage", "bookingManage"],
+  ];
+  simple.forEach(([view, key]) => add(view, both(key)));
+  (["legal", "privacy", "cookies", "terms", "sales"] as RouteKey[]).forEach((key) => add("legal", both(key), () => key));
+
+  // Pôles (slugs traduits)
+  const polesFr = getPoles("fr"), polesEn = getPoles("en");
+  polesFr.forEach((p, i) => add("pole", { fr: url("poles", "fr", p.urlSlug), en: url("poles", "en", polesEn[i].urlSlug) }, () => p.id));
+
+  // Projets : reliés entre langues par `key`
+  const pf = await getProjects("fr"), pe = await getProjects("en");
+  for (const p of pf) {
+    const twin = pe.find((x) => x.key === p.key);
+    const alts = { fr: url("projects", "fr", p.slug), en: twin ? url("projects", "en", twin.slug) : url("projects", "en") };
+    entries.push({ params: { lang: "fr", path: pathOf(alts.fr, "fr") }, props: { view: "project", lang: "fr", alternates: alts, data: p.key } });
+    if (twin) entries.push({ params: { lang: "en", path: pathOf(alts.en, "en") }, props: { view: "project", lang: "en", alternates: alts, data: p.key } });
+  }
+  for (const p of pe.filter((x) => !pf.some((f) => f.key === x.key))) {
+    const alts = { fr: url("projects", "fr"), en: url("projects", "en", p.slug) };
+    entries.push({ params: { lang: "en", path: pathOf(alts.en, "en") }, props: { view: "project", lang: "en", alternates: alts, data: p.key } });
+  }
+  return entries;
+}
+
+const { view, lang, alternates, data } = Astro.props as Entry["props"];
+const props = { lang, alternates };
+let project: Project | undefined;
+if (view === "project") project = (await getProjects(lang)).find((p) => p.key === data);
+---
+
+{view === "home" && <Home {...props} />}
+{view === "poles" && <PolesIndex {...props} />}
+{view === "pole" && <PoleDetail {...props} poleId={data} />}
+{view === "projects" && <ProjectsIndex {...props} />}
+{view === "project" && project && <ProjectDetail {...props} project={project} />}
+{view === "about" && <About {...props} />}
+{view === "contact" && <Contact {...props} />}
+{view === "booking" && <Booking {...props} />}
+{view === "bookingManage" && <BookingManage {...props} />}
+{view === "legal" && <Legal {...props} doc={data} />}

@@ -1,0 +1,30 @@
+---
+/**
+ * Racine du site : redirige vers /fr/ (langue par défaut) ou /en/ selon
+ * le choix mémorisé du visiteur, sinon la langue de son navigateur.
+ */
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nant'Unity</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href="/fr/" />
+    <link rel="alternate" hreflang="fr-FR" href="/fr/" />
+    <link rel="alternate" hreflang="en-GB" href="/en/" />
+    <link rel="alternate" hreflang="x-default" href="/fr/" />
+    <script is:inline>
+      (function () {
+        var l = null;
+        try { l = localStorage.getItem("nu-lang"); } catch (e) {}
+        if (l !== "fr" && l !== "en") l = /^fr\b/i.test(navigator.language || "fr") ? "fr" : (/^en\b/i.test(navigator.language || "") ? "en" : "fr");
+        location.replace("/" + l + "/" + location.search + location.hash);
+      })();
+    </script>
+    <noscript><meta http-equiv="refresh" content="0; url=/fr/" /></noscript>
+  </head>
+  <body style="background:#0b0b0b"><a href="/fr/" style="color:#ffbb54">Nant'Unity</a></body>
+</html>

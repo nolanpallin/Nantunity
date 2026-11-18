@@ -1,0 +1,77 @@
+---
+import F from "../F.astro";
+import { site } from "../../data/site";
+import { url } from "../../i18n";
+const L = site.legal;
+---
+
+<p>La présente politique explique comment {L.legalName} collecte et utilise vos données personnelles lorsque vous utilisez ce site, dans le respect du Règlement général sur la protection des données (UE) 2016/679 (« RGPD ») et de la loi n° 78-17 du 6 janvier 1978 modifiée (« loi Informatique et Libertés »).</p>
+
+<h2>1. Responsable du traitement</h2>
+<p>{L.legalName}, <F v={L.legalForm} />, dont le siège est situé <F v={L.headOffice} />.<br />Contact pour toute question relative à vos données : <a href={`mailto:${L.privacyContact}`}>{L.privacyContact}</a>.</p>
+<p>L’association n’est pas tenue de désigner un délégué à la protection des données (DPO). <mark class="todo-field">[À compléter : nom ou fonction de la personne référente RGPD au sein du bureau.]</mark></p>
+
+<h2>2. Données collectées, finalités et bases légales</h2>
+
+<h3>a) Formulaire de demande de projet</h3>
+<ul>
+  <li><strong>Données :</strong> nom et prénom, adresse e-mail, téléphone (facultatif), structure (facultatif), profil, pôle(s) concerné(s), échéance, contenu du message.</li>
+  <li><strong>Finalités :</strong> répondre à votre demande, échanger sur votre projet et vous adresser une proposition ou un devis.</li>
+  <li><strong>Base légale :</strong> mesures précontractuelles prises à votre demande (art. 6.1.b du RGPD).</li>
+  <li><strong>Durée de conservation :</strong> 3 ans à compter du dernier contact de votre part, puis suppression <mark class="todo-field">[durée proposée, à valider]</mark>.</li>
+</ul>
+
+<h3>b) Prise de rendez-vous en ligne</h3>
+<ul>
+  <li><strong>Données :</strong> prénom, nom, adresse e-mail, structure (facultatif), téléphone (facultatif, obligatoire pour un rendez-vous téléphonique), objet du rendez-vous, format souhaité, précisions éventuelles, date et heure choisies.</li>
+  <li><strong>Finalités :</strong> organiser le rendez-vous, l’inscrire dans l’agenda de l’équipe, vous envoyer une confirmation et vous permettre de le modifier ou de l’annuler.</li>
+  <li><strong>Base légale :</strong> mesures précontractuelles prises à votre demande (art. 6.1.b du RGPD).</li>
+  <li><strong>Durée de conservation :</strong> l’événement est conservé dans l’agenda jusqu’à 3 ans après le rendez-vous, puis supprimé <mark class="todo-field">[durée proposée, à valider]</mark>.</li>
+</ul>
+
+<h3>c) Gestion des clients</h3>
+<ul>
+  <li><strong>Données :</strong> coordonnées, échanges, devis, factures.</li>
+  <li><strong>Finalités :</strong> exécution des prestations, facturation, suivi de la relation.</li>
+  <li><strong>Base légale :</strong> exécution du contrat (art. 6.1.b) et obligations légales (art. 6.1.c).</li>
+  <li><strong>Durée de conservation :</strong> durée de la relation contractuelle, puis 3 ans ; les pièces comptables sont conservées 10 ans (article L.123-22 du Code de commerce).</li>
+</ul>
+
+<h3>d) Mesure d’audience (uniquement avec votre accord)</h3>
+<p>Aucun outil de mesure d’audience n’est actif à ce jour. Si un tel outil est ajouté, il ne sera chargé qu’après votre consentement (art. 6.1.a du RGPD et art. 82 de la loi Informatique et Libertés), que vous pourrez retirer à tout moment. Voir la <a href={url("cookies", "fr")}>politique cookies</a>.</p>
+
+<h3>e) Préférences d’affichage</h3>
+<p>Votre choix de langue, de thème (clair / sombre) et vos préférences de cookies sont enregistrés <strong>uniquement sur votre appareil</strong> (stockage local du navigateur). Ces informations ne nous sont pas transmises.</p>
+
+<h3>f) Données techniques</h3>
+<p>L’hébergeur du site peut enregistrer des journaux techniques (adresse IP, date, page demandée) à des fins de sécurité et de bon fonctionnement, pour la durée prévue par la réglementation qui lui est applicable. <mark class="todo-field">[À compléter selon l’hébergeur retenu.]</mark></p>
+
+<h2>3. Destinataires des données</h2>
+<p>Vos données sont accessibles uniquement aux membres de l’équipe de {L.legalName} habilités à traiter votre demande. Elles ne sont jamais vendues ni cédées à des fins commerciales. Elles peuvent être traitées, pour notre compte, par les prestataires techniques suivants (sous-traitants au sens de l’article 28 du RGPD) :</p>
+<ul>
+  <li><strong>Hébergement du site :</strong> <F v={L.host.name} /></li>
+  <li><strong>Agenda des rendez-vous :</strong> Google Calendar (Google Ireland Limited, Irlande)</li>
+  <li><strong>Envoi des e-mails automatiques :</strong> Resend (Resend, Inc., États-Unis)</li>
+</ul>
+<p>Certains de ces prestataires peuvent transférer des données en dehors de l’Union européenne. Ces transferts sont encadrés par des garanties appropriées (décision d’adéquation « EU-U.S. Data Privacy Framework » ou clauses contractuelles types de la Commission européenne). <mark class="todo-field">[À vérifier auprès de chaque prestataire au moment de la mise en ligne.]</mark></p>
+
+<h2>4. Sécurité</h2>
+<p>Le site est servi en HTTPS. Les liens de gestion des rendez-vous sont signés et propres à chaque réservation ; les clés d’accès aux services tiers sont stockées côté serveur et ne sont jamais exposées dans le navigateur. L’accès aux données est limité aux membres habilités.</p>
+
+<h2>5. Vos droits</h2>
+<p>Vous disposez des droits suivants sur vos données :</p>
+<ul>
+  <li>droit d’accès (art. 15 du RGPD) et de rectification (art. 16) ;</li>
+  <li>droit à l’effacement (art. 17) et à la limitation du traitement (art. 18) ;</li>
+  <li>droit à la portabilité (art. 20) ;</li>
+  <li>droit d’opposition (art. 21) ;</li>
+  <li>droit de retirer votre consentement à tout moment, lorsque le traitement repose sur celui-ci ;</li>
+  <li>droit de définir des directives relatives au sort de vos données après votre décès (art. 85 de la loi Informatique et Libertés).</li>
+</ul>
+
+<h2>6. Exercer vos droits</h2>
+<p>Écrivez-nous à <a href={`mailto:${L.privacyContact}`}>{L.privacyContact}</a> ou par courrier au siège de l’association (<F v={L.headOffice} />), en précisant votre demande. Nous vous répondrons dans un délai d’un mois, prolongeable de deux mois si la demande est complexe (art. 12 du RGPD). Un justificatif d’identité pourra vous être demandé en cas de doute raisonnable.</p>
+<p>Si vous estimez, après nous avoir contactés, que vos droits ne sont pas respectés, vous pouvez introduire une réclamation auprès de la CNIL : 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07 — <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>.</p>
+
+<h2>7. Modification de la politique</h2>
+<p>Cette politique peut être mise à jour, notamment en cas d’évolution des services ou de la réglementation. La date de dernière mise à jour figure en haut de la page.</p>

@@ -1,0 +1,164 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Arrow from "../components/Arrow.astro";
+import SlotPicker from "../components/SlotPicker.astro";
+import { useT, url, rich, type Lang } from "../i18n";
+
+interface Props { lang: Lang; alternates: Record<Lang, string> }
+const { lang, alternates } = Astro.props;
+const t = useT(lang);
+const b = t.booking;
+const m = b.manage;
+const typeNames = Object.fromEntries(Object.entries(b.types).map(([k, v]) => [k, v.name]));
+const i18n = {
+  lang, prevMonth: b.prevMonth, nextMonth: b.nextMonth, pickDay: b.pickDay, noSlots: b.noSlots, slotsFor: b.slotsFor,
+  loading: b.loading, loadError: b.loadError, tzLocal: b.tzLocal,
+  invalid: m.invalid, notFound: m.notFound, cancelled: m.cancelled, rescheduled: m.rescheduled, past: m.past,
+  errConflict: b.errConflict, errGeneric: b.errGeneric, errRate: b.errRate, typeNames,
+};
+---
+
+<BaseLayout lang={lang} alternates={alternates} title={m.title} noindex>
+  <section class="page-hero theme-ink mhero">
+    <div class="container">
+      <p class="page-hero__label label">{b.label}</p>
+      <h1 class="page-hero__title display">
+        {m.h1.map((l) => <span style="display:block" set:html={rich(l)} />)}
+      </h1>
+    </div>
+  </section>
+
+  <section class="section theme-paper manage" data-manage data-i18n={JSON.stringify(i18n)}>
+    <div class="container container--narrow">
+      <p class="manage__msg" data-msg role="status" aria-live="polite">{m.loading}</p>
+
+      <div class="card" data-card hidden>
+        <p class="label">{m.details}</p>
+        <dl class="card__dl">
+          <div><dt>{m.type}</dt><dd data-f="type"></dd></div>
+          <div><dt>{m.when}</dt><dd data-f="when"></dd></div>
+          <div><dt>{m.name}</dt><dd data-f="name"></dd></div>
+          <div><dt>{b.channel}</dt><dd data-f="channel"></dd></div>
+        </dl>
+        <p class="card__tz">{b.tz}</p>
+        <div class="card__actions" data-actions>
+          <button type="button" class="btn" data-reschedule>{m.reschedule} <Arrow /></button>
+          <button type="button" class="btn btn--ghost" data-cancel>{m.cancel}</button>
+        </div>
+        <div class="card__confirm" data-confirm hidden>
+          <p><strong>{m.cancelConfirm}</strong></p>
+          <button type="button" class="btn btn--dark" data-cancel-yes>{m.cancelYes}</button>
+          <button type="button" class="link-u" data-cancel-no>{t.common.close}</button>
+        </div>
+      </div>
+
+      <div class="resched" data-resched hidden>
+        <SlotPicker />
+        <div class="resched__foot">
+          <button type="button" class="btn" disabled data-resched-confirm>{m.rescheduleConfirm} <Arrow /></button>
+        </div>
+      </div>
+
+      <a href={url("booking", lang)} class="btn btn--ghost manage__new" data-new hidden>{m.newBooking} <Arrow /></a>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { mountPicker, slotLabel } from "../scripts/booking";
+
+  const root = document.querySelector<HTMLElement>("[data-manage]")!;
+  const i18n = JSON.parse(root.dataset.i18n!);
+  const token = new URLSearchParams(location.search).get("t") || "";
+  const $ = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
+  const msg = $("[data-msg]"), card = $("[data-card]"), resched = $("[data-resched]"), newBtn = $("[data-new]");
+  let booking: any = null;
+  let slot: string | null = null;
+  let picker: ReturnType<typeof mountPicker> | null = null;
+
+  const say = (text: string, state = "") => { msg.textContent = text; msg.dataset.state = state; msg.hidden = !text; };
+
+  function render() {
+    card.hidden = false;
+    $("[data-f=type]").textContent = i18n.typeNames[booking.type] ?? booking.type;
+    $("[data-f=when]").textContent = slotLabel(booking.start, i18n.lang);
+    $("[data-f=name]").textContent = `${booking.firstName} ${booking.lastName}`;
+    $("[data-f=channel]").textContent = booking.channel;
+    $("[data-actions]").hidden = !booking.canChange;
+    if (!booking.canChange) say(i18n.past);
+  }
+
+  async function load() {
+    if (!token) return say(i18n.invalid, "error");
+    try {
+      const res = await fetch(`/api/booking/manage?t=${encodeURIComponent(token)}`);
+      if (res.status === 403) return say(i18n.invalid, "error");
+      if (res.status === 404) { newBtn.hidden = false; return say(i18n.notFound, "error"); }
+      if (!res.ok) throw new Error();
+      booking = (await res.json()).booking;
+      say("");
+      render();
+    } catch {
+      say(i18n.errGeneric, "error");
+    }
+  }
+
+  async function post(body: Record<string, unknown>) {
+    const res = await fetch("/api/booking/manage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ t: token, ...body }) });
+    return { res, json: await res.json().catch(() => ({})) };
+  }
+
+  $("[data-cancel]").addEventListener("click", () => { $("[data-confirm]").hidden = false; $<HTMLButtonElement>("[data-cancel-yes]").focus(); });
+  $("[data-cancel-no]").addEventListener("click", () => { $("[data-confirm]").hidden = true; });
+  $("[data-cancel-yes]").addEventListener("click", async () => {
+    const { res } = await post({ action: "cancel" });
+    if (res.ok) { card.hidden = true; resched.hidden = true; newBtn.hidden = false; say(i18n.cancelled, "ok"); }
+    else say(res.status === 410 ? i18n.past : res.status === 429 ? i18n.errRate : i18n.errGeneric, "error");
+  });
+
+  $("[data-reschedule]").addEventListener("click", () => {
+    resched.hidden = false;
+    if (!picker) {
+      picker = mountPicker(root.querySelector("[data-picker]")!, i18n, {
+        type: booking.type, token,
+        onSelect(iso) { slot = iso; $<HTMLButtonElement>("[data-resched-confirm]").disabled = !iso; },
+      });
+    }
+    resched.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  $("[data-resched-confirm]").addEventListener("click", async () => {
+    if (!slot) return;
+    const { res, json } = await post({ action: "reschedule", start: slot });
+    if (res.ok) { booking = json.booking; resched.hidden = true; render(); say(i18n.rescheduled, "ok"); card.scrollIntoView({ behavior: "smooth" }); }
+    else if (res.status === 409) { say(i18n.errConflict, "error"); picker?.refresh(); }
+    else say(res.status === 410 ? i18n.past : res.status === 429 ? i18n.errRate : i18n.errGeneric, "error");
+  });
+
+  load();
+</script>
+
+<style>
+  .mhero { padding-bottom: clamp(2.5rem, 5vw, 4rem); }
+  .manage { padding-top: clamp(2.5rem, 5vw, 4rem); }
+  .manage .container--narrow { display: grid; gap: 1.5rem; max-width: calc(980px + 2 * var(--gutter)); }
+  .manage__msg { font-weight: 600; font-size: var(--fs-lg); }
+  .manage__msg[data-state="ok"] { color: var(--success); }
+  .manage__msg[data-state="error"] { color: var(--danger); }
+  .manage__msg[hidden] { display: none; }
+  .card { background: var(--surface); border-radius: var(--radius-l); padding: clamp(1.25rem, 4vw, 2.5rem); display: grid; gap: 1.25rem; }
+  .card[hidden], .resched[hidden], .card__confirm[hidden], [data-actions][hidden] { display: none; }
+  .card .label { color: var(--accent-text); }
+  .card__dl { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 2rem; }
+  .card__dl div { border-top: 1px solid var(--line); padding-top: 0.75rem; }
+  .card__dl dt { font-size: var(--fs-xs); color: var(--fg-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; }
+  .card__dl dd { font-weight: 700; margin-top: 0.25rem; }
+  .card__dl dd::first-letter { text-transform: uppercase; }
+  .card__tz { font-size: var(--fs-sm); color: var(--fg-muted); }
+  .card__actions, .card__confirm { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+  .card__confirm { padding: 1rem; border-radius: var(--radius-m); background: color-mix(in srgb, var(--danger) 12%, transparent); }
+  .resched { display: grid; gap: 1rem; }
+  .resched__foot { display: flex; justify-content: flex-end; }
+  .manage__new { justify-self: start; }
+  .manage__new[hidden] { display: none; }
+  @media (max-width: 600px) { .card__dl { grid-template-columns: 1fr; } }
+</style>

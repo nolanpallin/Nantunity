@@ -1,0 +1,122 @@
+---
+/**
+ * Gestion du consentement aux cookies, conforme aux recommandations de la CNIL :
+ *  - aucun traceur non essentiel n'est chargé avant consentement ;
+ *  - « Tout accepter » et « Tout refuser » au même niveau, choix granulaire via « Personnaliser » ;
+ *  - choix conservé 6 mois puis redemandé ; modifiable à tout moment (lien « Gérer les cookies »).
+ * Les scripts soumis à consentement s'écrivent :
+ *   <script type="text/plain" data-consent="analytics" data-src="https://…"></script>
+ */
+import { useT, url, type Lang } from "../i18n";
+import { site } from "../data/site";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang).cookies;
+const cats = ["analytics", "media"] as const;
+---
+
+{site.analytics.src && <script type="text/plain" data-consent="analytics" data-src={site.analytics.src} data-attrs={JSON.stringify(site.analytics.attrs)} />}
+
+<section class="cc" data-cc hidden aria-labelledby="cc-title" role="region">
+  <div class="cc__box">
+    <p class="cc__title display" id="cc-title">{t.title}</p>
+    <p class="cc__text">{t.text} <a href={url("cookies", lang)} class="cc__more">{t.more}</a></p>
+    <div class="cc__actions">
+      <button type="button" class="btn btn--dark cc__btn" data-cc-reject>{t.reject}</button>
+      <button type="button" class="btn btn--dark cc__btn" data-cc-accept>{t.accept}</button>
+      <button type="button" class="cc__link" data-cookie-open>{t.customize}</button>
+    </div>
+  </div>
+</section>
+
+<dialog class="ccd" data-cc-dialog aria-labelledby="ccd-title">
+  <form method="dialog" class="ccd__inner" data-cc-form>
+    <div class="ccd__head">
+      <h2 class="display ccd__title" id="ccd-title">{t.panelTitle}</h2>
+      <button type="submit" value="close" class="ccd__close" aria-label={useT(lang).common.close}>×</button>
+    </div>
+    <ul class="ccd__list" role="list">
+      <li class="ccd__item">
+        <div>
+          <p class="ccd__name">{t.categories.necessary.name}</p>
+          <p class="ccd__desc">{t.categories.necessary.text}</p>
+        </div>
+        <span class="ccd__always">{t.always}</span>
+      </li>
+      {
+        cats.map((c) => (
+          <li class="ccd__item">
+            <label for={`cc-${c}`}>
+              <span class="ccd__name">{t.categories[c].name}</span>
+              <span class="ccd__desc">{t.categories[c].text}</span>
+            </label>
+            <span class="switch">
+              <input type="checkbox" role="switch" id={`cc-${c}`} name={c} />
+              <span class="switch__ui" aria-hidden="true" />
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="ccd__actions">
+      <button type="button" class="btn btn--ghost" data-cc-reject>{t.reject}</button>
+      <button type="button" class="btn btn--ghost" data-cc-accept>{t.accept}</button>
+      <button type="button" class="btn" data-cc-save>{t.save}</button>
+    </div>
+    <a href={url("cookies", lang)} class="ccd__more link-u">{t.more}</a>
+  </form>
+</dialog>
+
+<script>
+  import { initConsent } from "../scripts/consent";
+  initConsent();
+</script>
+
+<style>
+  .cc {
+    position: fixed; z-index: 200; left: var(--gutter); bottom: var(--gutter);
+    width: min(520px, calc(100% - 2 * var(--gutter)));
+    background: var(--surface-raised); color: var(--fg);
+    border-radius: var(--radius-l); box-shadow: var(--shadow-raised);
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--c-orange);
+    animation: cc-in 700ms var(--ease-out) both;
+  }
+  .cc[hidden] { display: none; }
+  @keyframes cc-in { from { opacity: 0; transform: translateY(30px); } }
+  .cc__box { padding: 1.5rem; display: grid; gap: 0.9rem; }
+  .cc__title { font-size: var(--fs-xl); color: var(--accent-display); }
+  .cc__text { font-size: var(--fs-sm); color: var(--fg-muted); line-height: 1.5; }
+  .cc__more { text-decoration: underline; text-underline-offset: 3px; }
+  .cc__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+  .cc__btn { padding: 0.8rem 1.2rem; font-size: 0.75rem; }
+  .cc__link { font-weight: 700; font-size: var(--fs-sm); text-decoration: underline; text-underline-offset: 3px; padding: 0.6rem; }
+
+  .ccd {
+    width: min(600px, calc(100% - 2rem)); max-height: calc(100% - 2rem); padding: 0; border: 0;
+    border-radius: var(--radius-l); background: var(--surface-raised); color: var(--fg); box-shadow: var(--shadow-raised);
+  }
+  .ccd::backdrop { background: rgb(0 0 0 / 0.55); backdrop-filter: blur(4px); }
+  .ccd__inner { padding: clamp(1.25rem, 4vw, 2rem); display: grid; gap: 1.25rem; }
+  .ccd__head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+  .ccd__title { font-size: var(--fs-2xl); }
+  .ccd__close { width: 40px; height: 40px; border-radius: 50%; font-size: 1.6rem; line-height: 1; }
+  .ccd__close:hover { background: var(--line); }
+  .ccd__list { display: grid; }
+  .ccd__item { display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; padding: 1rem 0; border-top: 1px solid var(--line); }
+  .ccd__item label { cursor: pointer; }
+  .ccd__name { display: block; font-weight: 700; }
+  .ccd__desc { display: block; font-size: var(--fs-sm); color: var(--fg-muted); margin-top: 0.25rem; }
+  .ccd__always { font-size: var(--fs-xs); font-weight: 700; color: var(--accent-text); white-space: nowrap; }
+  .ccd__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: flex-end; }
+  .ccd__actions .btn { padding: 0.85rem 1.2rem; font-size: 0.75rem; }
+  .ccd__more { justify-self: start; font-size: var(--fs-sm); font-weight: 600; }
+
+  .switch { position: relative; flex: none; width: 52px; height: 30px; }
+  .switch input { position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0; z-index: 1; }
+  .switch__ui { position: absolute; inset: 0; border-radius: 999px; background: var(--line-strong); transition: background var(--dur); }
+  .switch__ui::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--c-white); transition: transform var(--dur) var(--ease-out); box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); }
+  .switch input:checked + .switch__ui { background: var(--c-orange-deep); }
+  .switch input:checked + .switch__ui::after { transform: translateX(22px); }
+  .switch input:focus-visible + .switch__ui { box-shadow: var(--focus); }
+</style>

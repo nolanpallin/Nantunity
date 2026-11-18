@@ -1,0 +1,111 @@
+---
+import { render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Arrow from "../components/Arrow.astro";
+import ProjectCover from "../components/ProjectCover.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { getPole, poleVars } from "../data/poles";
+import { getProjects, type Project } from "../lib/projects";
+import { useT, url, type Lang } from "../i18n";
+
+interface Props { lang: Lang; alternates: Record<Lang, string>; project: Project }
+const { lang, alternates, project } = Astro.props;
+const t = useT(lang);
+const pd = t.projectDetail;
+const all = await getProjects(lang);
+const next = all.length > 1 ? all[(all.findIndex((p) => p.key === project.key) + 1) % all.length] : undefined;
+const d = project.data;
+const pole = getPole(d.pole, lang)!;
+const nextPole = next ? getPole(next.data.pole, lang)! : undefined;
+const { Content } = await render(project);
+const tone = pole.colors.ink === "#ffffff" ? "light" : "dark";
+---
+
+<BaseLayout lang={lang} alternates={alternates} title={d.title} description={d.summary} headerTone={tone} poleStyle={poleVars(pole)} noindex={d.placeholder}>
+  <section class="page-hero theme-pole proj-hero">
+    <div class="container">
+      <nav aria-label={t.common.breadcrumb}>
+        <ol class="breadcrumb" role="list">
+          <li><a href={url("home", lang)}>{t.common.home}</a></li>
+          <li><a href={url("projects", lang)}>{t.nav.projects}</a></li>
+          <li aria-current="page">{d.title}</li>
+        </ol>
+      </nav>
+      <div class="proj-hero__top" data-reveal>
+        <a href={url("poles", lang, pole.urlSlug)} class="chip proj-hero__pole"><span class="dot"></span>{pole.name}</a>
+      </div>
+      <h1 class="proj-hero__title display" data-reveal style="--d:1">{d.title}</h1>
+      <p class="proj-hero__summary" data-reveal style="--d:2">{d.summary}</p>
+    </div>
+  </section>
+
+  <div class="container proj-cover" data-reveal="scale">
+    <ProjectCover pole={d.pole} lang={lang} pattern={d.pattern} cover={d.cover} alt={d.title} eager />
+  </div>
+
+  <section class="section theme-paper proj-body">
+    <div class="container proj-body__grid">
+      <aside class="meta" aria-label={pd.info}>
+        <dl>
+          <div><dt class="label">{pd.client}</dt><dd>{d.client}</dd></div>
+          <div><dt class="label">{pd.year}</dt><dd>{d.year}</dd></div>
+          <div><dt class="label">{t.common.pole}</dt><dd><a href={url("poles", lang, pole.urlSlug)} class="link-u">{pole.name}</a></dd></div>
+          {
+            d.services.length > 0 && (
+              <div>
+                <dt class="label">{pd.services}</dt>
+                <dd><ul role="list">{d.services.map((s) => <li>{s}</li>)}</ul></dd>
+              </div>
+            )
+          }
+        </dl>
+      </aside>
+      <article class="prose">
+        <Content />
+      </article>
+    </div>
+  </section>
+
+  {
+    next && nextPole && (
+      <a href={url("projects", lang, next.slug)} class="next-proj" style={poleVars(nextPole)}>
+        <span class="container next-proj__inner">
+          <span class="label">{t.common.nextProject}</span>
+          <span class="next-proj__title display">{next.data.title}</span>
+          <Arrow size={40} class="next-proj__arrow" />
+        </span>
+      </a>
+    )
+  }
+
+  <CtaBand lang={lang} />
+</BaseLayout>
+
+<style>
+  .proj-hero { padding-bottom: clamp(8rem, 14vw, 14rem); }
+  .proj-hero__top { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: var(--space-5); }
+  .proj-hero__pole { color: var(--pole-title); }
+  .proj-hero__pole .dot { background: var(--pole-title); }
+  .proj-hero__title { font-size: var(--fs-4xl); color: var(--pole-title); max-width: 16ch; }
+  .proj-hero__summary { font-size: var(--fs-xl); max-width: 46ch; margin-top: var(--space-6); line-height: 1.35; }
+  .proj-cover { margin-top: clamp(-11rem, -12vw, -6rem); position: relative; z-index: 2; }
+  .proj-cover :global(.cover) { border-radius: var(--radius-l); aspect-ratio: 16 / 8; box-shadow: var(--shadow-l); }
+
+  .proj-body__grid { display: grid; grid-template-columns: 1fr 2.2fr; gap: clamp(2rem, 6vw, 7rem); align-items: start; }
+  .meta { position: sticky; top: calc(var(--header-h) + 1.5rem); }
+  .meta dl { display: grid; gap: 1.5rem; }
+  .meta dl > div { padding-top: 1rem; border-top: 1px solid var(--line); }
+  .meta dt { color: var(--fg-muted); margin-bottom: 0.4rem; }
+  .meta dd { font-weight: 500; }
+  .meta dd li + li { margin-top: 0.2rem; }
+  .prose :global(h2) { color: var(--pole-text); }
+  .prose :global(blockquote) { font-family: var(--f-sans); font-style: normal; font-size: var(--fs-base); background: var(--surface); border-left-color: var(--pole-bg); padding: 1rem 1.25rem; border-radius: 0 var(--radius-m) var(--radius-m) 0; }
+  @media (max-width: 860px) { .proj-body__grid { grid-template-columns: 1fr; } .meta { position: static; } }
+
+  .next-proj { display: block; background: var(--pole-bg); color: var(--pole-ink); }
+  .next-proj__inner { display: flex; align-items: center; gap: 2rem; padding-block: clamp(2.5rem, 6vw, 5rem); }
+  .next-proj__title { font-size: var(--fs-3xl); color: var(--pole-title); flex: 1; transition: transform 700ms var(--ease-out); }
+  .next-proj:hover .next-proj__title { transform: translateX(1.5rem); }
+  :global(.next-proj__arrow) { flex: none; color: var(--pole-title); }
+  @media (max-width: 600px) { .next-proj__inner { flex-wrap: wrap; gap: 0.5rem 1rem; } .next-proj__inner .label { width: 100%; } }
+</style>

@@ -1,0 +1,46 @@
+---
+import F from "../F.astro";
+import { site } from "../../data/site";
+const L = site.legal;
+---
+
+<div class="legal-warning">
+  <strong>Modèle à faire valider.</strong> Ces conditions générales de vente sont un projet de structure. Elles doivent être adaptées au fonctionnement réel de l’association (convention d’études, statut fiscal, modalités de paiement…) et validées, par exemple auprès de la CNJE ou d’un professionnel du droit, avant d’être appliquées.
+</div>
+
+<h2>1. Champ d’application</h2>
+<p>Les présentes conditions générales de vente (CGV) s’appliquent aux prestations réalisées par {L.legalName} (<F v={L.legalForm} />, <F v={L.rna} />) pour ses clients professionnels (entreprises, associations, commerces) et particuliers. Elles prévalent sur tout autre document, sauf conditions particulières acceptées par écrit.</p>
+
+<h2>2. Devis et commande</h2>
+<p>Toute prestation fait l’objet d’un devis gratuit et détaillé (description, livrables, planning, prix). Le devis est valable <F v="[À compléter : durée de validité, ex. 30 jours]" />. La commande est ferme à réception du devis daté et signé, accompagné le cas échéant de l’acompte prévu.</p>
+
+<h2>3. Prix</h2>
+<p>Les prix sont indiqués en euros, <F v="[À compléter : hors taxes / toutes taxes comprises, régime de TVA applicable]" />. Ils comprennent les prestations décrites au devis ; toute demande supplémentaire fait l’objet d’un avenant.</p>
+
+<h2>4. Modalités de paiement</h2>
+<p>Un acompte de <F v="[À compléter : pourcentage]" /> est demandé à la commande ; le solde est payable à <F v="[À compléter : délai, ex. 30 jours à réception de facture]" />, par virement bancaire.</p>
+<p>Pour les clients professionnels, tout retard de paiement entraîne de plein droit des pénalités calculées au taux d’intérêt appliqué par la Banque centrale européenne à son opération de refinancement la plus récente, majoré de 10 points (article L.441-10 du Code de commerce), ainsi qu’une indemnité forfaitaire pour frais de recouvrement de 40 € (article D.441-5 du Code de commerce).</p>
+
+<h2>5. Réalisation et délais</h2>
+<p>Les délais figurent au devis et courent à compter de la commande et de la réception des éléments nécessaires fournis par le client. Des points d’étape sont organisés tout au long de la mission. Un retard imputable à un défaut de transmission d’éléments ou de validation par le client prolonge d’autant les délais.</p>
+
+<h2>6. Obligations du client</h2>
+<p>Le client s’engage à fournir des informations et contenus exacts, à disposer des droits sur les éléments qu’il transmet (textes, images, logos) et à valider les livrables dans les délais convenus. Sans retour dans un délai de <F v="[À compléter : ex. 15 jours]" /> après livraison, les livrables sont réputés acceptés.</p>
+
+<h2>7. Propriété intellectuelle</h2>
+<p>Les droits patrimoniaux sur les créations livrées (reproduction, représentation, adaptation) sont cédés au client à compter du paiement intégral du prix, pour les usages, supports, territoire et durée précisés au devis (article L.131-3 du Code de la propriété intellectuelle). Les travaux préparatoires et pistes non retenues restent la propriété de {L.legalName}. Sauf refus écrit du client, {L.legalName} peut présenter la réalisation dans son portfolio.</p>
+
+<h2>8. Confidentialité</h2>
+<p>{L.legalName} s’engage à garder confidentielles les informations non publiques communiquées par le client dans le cadre de la mission.</p>
+
+<h2>9. Responsabilité</h2>
+<p>{L.legalName} est tenue d’une obligation de moyens. Sa responsabilité est limitée aux dommages directs et, pour les clients professionnels, au montant de la prestation concernée. <F v="[À compléter : assurance responsabilité civile de l’association, le cas échéant]" /></p>
+
+<h2>10. Droit de rétractation (clients particuliers)</h2>
+<p>Lorsque le contrat est conclu à distance ou hors établissement avec un consommateur, celui-ci dispose d’un délai de 14 jours pour se rétracter, sans avoir à motiver sa décision (article L.221-18 du Code de la consommation), en adressant sa décision par écrit à <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>. Si le consommateur demande expressément que la prestation commence avant la fin de ce délai, il reste redevable du montant correspondant au service fourni jusqu’à sa rétractation ; il perd son droit de rétractation si la prestation a été pleinement exécutée avec son accord préalable exprès (articles L.221-25 et L.221-28 du Code de la consommation).</p>
+
+<h2>11. Médiation de la consommation</h2>
+<p>En cas de litige, le client particulier peut recourir gratuitement à un médiateur de la consommation (article L.612-1 du Code de la consommation) : <F v={L.mediator} />.</p>
+
+<h2>12. Droit applicable et litiges</h2>
+<p>Les présentes CGV sont soumises au droit français. Les parties rechercheront une solution amiable avant toute action. À défaut, pour les clients professionnels, compétence est attribuée aux tribunaux du ressort de <F v="[À compléter : ex. Nantes]" /> ; pour les consommateurs, les règles légales de compétence s’appliquent.</p>

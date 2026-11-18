@@ -1,0 +1,133 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Heritage from "../components/Heritage.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import ProjectsEmpty from "../components/ProjectsEmpty.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { getPoles, poleVars } from "../data/poles";
+import { getProjects } from "../lib/projects";
+import { useT, type Lang } from "../i18n";
+
+interface Props { lang: Lang; alternates: Record<Lang, string> }
+const { lang, alternates } = Astro.props;
+const t = useT(lang);
+const pp = t.projectsPage;
+const poles = getPoles(lang);
+const projects = await getProjects(lang);
+const counts = Object.fromEntries(poles.map((p) => [p.id, projects.filter((x) => x.data.pole === p.id).length]));
+const shownLabels = { one: pp.shown(1), many: pp.shown(2).replace("2", "{n}") };
+---
+
+<BaseLayout lang={lang} alternates={alternates} title={pp.title} description={pp.description} headerTone="auto">
+  <section class="page-hero theme-paper has-motif">
+    <div class="container phead">
+      <div>
+        <p class="page-hero__label label" data-reveal>{pp.label}</p>
+        <h1 class="page-hero__title display lines">
+          <span class="line"><span>{pp.h1[0]}</span></span>
+          <span class="line"><span>{pp.h1[1]}<span class="serif-i">’</span></span></span>
+        </h1>
+      </div>
+      <p class="page-hero__intro" data-reveal style="--d:2">{pp.intro}</p>
+    </div>
+  </section>
+
+  <section class="section theme-paper portfolio">
+    <div class="container">
+      {
+        projects.length === 0 ? (
+          <ProjectsEmpty lang={lang} />
+        ) : (
+          <>
+            <div class="filters" role="group" aria-label={pp.filterLabel} data-filters>
+              <button type="button" class="filter" aria-pressed="true" data-filter="all">
+                {pp.all} <sup>{projects.length}</sup>
+              </button>
+              {poles.filter((p) => counts[p.id] > 0).map((p) => (
+                <button type="button" class="filter" aria-pressed="false" data-filter={p.id} style={poleVars(p)}>
+                  <span class="dot" />
+                  {p.name} <sup>{counts[p.id]}</sup>
+                </button>
+              ))}
+            </div>
+            <p class="visually-hidden" aria-live="polite" data-filter-status data-one={shownLabels.one} data-many={shownLabels.many} />
+            <ul class="grid" role="list" data-grid>
+              {projects.map((p, i) => (
+                <li class="grid__item" data-pole={p.data.pole} data-reveal style={`--d:${i % 3}`}>
+                  <ProjectCard project={p} headingLevel="h2" />
+                </li>
+              ))}
+            </ul>
+            <p class="empty-filter" hidden data-empty>{pp.empty}</p>
+          </>
+        )
+      }
+    </div>
+  </section>
+
+  {projects.length > 0 && <CtaBand lang={lang} title={pp.ctaTitle} accent={pp.ctaAccent} />}
+</BaseLayout>
+
+<script>
+  const wrap = document.querySelector<HTMLElement>("[data-filters]");
+  const items = [...document.querySelectorAll<HTMLElement>("[data-grid] > li")];
+  const status = document.querySelector<HTMLElement>("[data-filter-status]");
+  const empty = document.querySelector<HTMLElement>("[data-empty]");
+
+  function apply(filter: string, push = true) {
+    if (!wrap) return;
+    wrap.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filter === filter)));
+    let shown = 0;
+    items.forEach((li) => {
+      const match = filter === "all" || li.dataset.pole === filter;
+      li.hidden = !match;
+      if (match) { shown++; requestAnimationFrame(() => li.classList.add("is-in")); }
+    });
+    if (empty) empty.hidden = shown > 0;
+    if (status) status.textContent = shown === 1 ? status.dataset.one! : status.dataset.many!.replace("{n}", String(shown));
+    if (push) {
+      const u = new URL(location.href);
+      filter === "all" ? u.searchParams.delete("pole") : u.searchParams.set("pole", filter);
+      history.replaceState(null, "", u);
+    }
+  }
+
+  wrap?.addEventListener("click", (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-filter]");
+    if (btn) apply(btn.dataset.filter || "all");
+  });
+  const initial = new URLSearchParams(location.search).get("pole");
+  if (initial && wrap?.querySelector(`[data-filter="${CSS.escape(initial)}"]`)) apply(initial, false);
+</script>
+
+<style>
+  .phead { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--space-6); align-items: end; }
+  @media (max-width: 860px) { .phead { grid-template-columns: 1fr; } }
+
+  .portfolio { padding-top: 0; }
+  .filters {
+    position: sticky; top: calc(var(--header-h) - 10px); z-index: 5;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    padding: 1rem 0; margin-bottom: var(--space-7);
+    background: var(--bg-paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .filter {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.65rem 1.1rem; border-radius: var(--radius-pill);
+    border: 1.5px solid var(--line); background: var(--surface); color: var(--fg);
+    font-weight: 500; font-size: var(--fs-sm);
+    transition: background var(--dur), color var(--dur), border-color var(--dur), transform var(--dur-fast);
+  }
+  .filter sup { font-size: 0.7em; opacity: 0.65; }
+  .filter:hover { border-color: var(--fg); }
+  .filter[aria-pressed="true"] { background: var(--pole-bg, var(--inverse-bg)); color: var(--pole-ink, var(--inverse-fg)); border-color: var(--pole-bg, var(--inverse-bg)); }
+  .filter[aria-pressed="true"] .dot { background: var(--pole-title); }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-8) var(--gutter); }
+  .grid__item:nth-child(3n + 2) { margin-top: 3rem; }
+  .grid__item[hidden] { display: none; }
+  @media (max-width: 960px) { .grid { grid-template-columns: 1fr 1fr; } .grid__item:nth-child(3n + 2) { margin-top: 0; } .grid__item:nth-child(even) { margin-top: 3rem; } }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } .grid__item:nth-child(even) { margin-top: 0; } }
+  .empty-filter { padding: 3rem 0; font-size: var(--fs-lg); }
+</style>
